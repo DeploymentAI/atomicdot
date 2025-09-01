@@ -404,72 +404,48 @@
         <p>© 2025 AtomicDot. Access any atom of thought for personal impact.</p>
     </footer>
 
-    <script>
-        // Hero Canvas Animation - Circular Fluid Dots with Parallax
-        const canvas = document.getElementById('heroCanvas');
-        const ctx = canvas.getContext('2d');
-        let dots = [];
-        let frame = 0;
-        let scrollY = 0;
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            initDots();
+  <script>
+    // HERO: fluid atoms that periodically form a simple ring shape
+    (function(){
+      const canvas = document.getElementById('heroCanvas');
+      const ctx = canvas.getContext('2d');
+      const titleEl = document.querySelector('.hero-content h1');
+      let W, H, dots = [], gridGap = 22, t = 0, phase = 0;
+      let safeR = 140 * (window.devicePixelRatio||1);
+
+      function measureSafeRadius(){
+        try{
+          const r = titleEl.getBoundingClientRect();
+          const px = window.devicePixelRatio||1;
+          const margin = 60;
+          safeR = (Math.max(r.width, r.height)/2 + margin) * px;
+        }catch(_){}
+      }
+
+      function resize(){
+        W = canvas.width  = window.innerWidth * devicePixelRatio;
+        H = canvas.height = window.innerHeight * devicePixelRatio;
+        canvas.style.width  = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        measureSafeRadius();
+        initDots();
+      }
+      window.addEventListener('resize', resize);
+
+      function initDots(){
+        dots = [];
+        const cols = Math.floor((W/devicePixelRatio) / gridGap);
+        const rows = Math.floor((H/devicePixelRatio) / gridGap);
+        for(let x=0;x<cols;x++){
+          for(let y=0;y<rows;y++){
+            const px = (x*gridGap + gridGap/2) * devicePixelRatio;
+            const py = (y*gridGap + gridGap/2) * devicePixelRatio;
+            dots.push({ ox:px, oy:py, x:px, y:py, s:0.8+Math.random()*1.6, a:0.15+Math.random()*0.35, p:Math.random()*Math.PI*2, tx:px, ty:py });
+          }
         }
+        setTargets('grid');
 
-        function initDots() {
-            dots = [];
-            const numDots = 150;
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            
-            for (let i = 0; i < numDots; i++) {
-                const angle = (i / numDots) * Math.PI * 2;
-                const radius = 100 + Math.random() * 150;
-                dots.push({
-                    x: centerX + Math.cos(angle) * radius,
-                    y: centerY + Math.sin(angle) * radius,
-                    size: Math.random() * 2 + 1,
-                    phase: Math.random() * Math.PI * 2,
-                    speed: Math.random() * 0.02 + 0.01,
-                    radius: radius,
-                    angle: angle
-                });
-            }
-        }
-
-        function animateHero() {
-            frame += 0.01;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2 - scrollY * 0.5;
-            
-            dots.forEach((dot, i) => {
-                const angle = dot.angle + frame * dot.speed;
-                const radius = dot.radius + Math.sin(frame * 2 + dot.phase) * 30;
-                
-                dot.x = centerX + Math.cos(angle) * radius;
-                dot.y = centerY + Math.sin(angle) * radius - scrollY * 0.3;
-                
-                const alpha = 0.3 + Math.sin(frame + i * 0.1) * 0.2;
-                ctx.fillStyle = `rgba(10, 10, 10, ${alpha})`;
-                ctx.beginPath();
-                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            
-            requestAnimationFrame(animateHero);
-        }
-
-        window.addEventListener('scroll', () => {
-            scrollY = window.scrollY;
-        });
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        animateHero();
 
         // Service Icon Animations
         document.querySelectorAll('.service-canvas').forEach(canvas => {
