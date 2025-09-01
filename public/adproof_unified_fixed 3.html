@@ -438,18 +438,48 @@
   overflow: visible;
   display: inline-block;
 }
-/* Make header text never collide with canvas on mobile */
-@media (max-width: 640px) {
-  .header { padding: 120px 0 80px; }
-  .header h1 { font-size: clamp(32px, 8vw, 56px); }
-  .header-sub { font-size: clamp(14px, 4.5vw, 18px); }
-  .stat-card { min-height: 120px; }
+/* ---- anti-crop + layer order fixes ---- */
+
+/* Put header visuals behind content */
+.header,
+.hero,
+.header-wrap { position: relative; z-index: 0; }
+.header-canvas,
+.hero-canvas,
+.header::before,
+.header::after { position: absolute; inset: 0; z-index: -1; }
+
+/* Give breathing room below the header so stats never sit under it */
+.section--stats,
+.stats-section,
+.stats-grid-wrap { 
+  margin-top: clamp(32px, 6vw, 96px);
+  overflow: visible;
 }
-/* Ensure stats section doesn't clip inner content */
-.stats-section, .stats-grid { overflow: visible; }
-/* Slightly reduce the max scale of animated numbers on very tiny viewports */
-@media (max-width: 360px) {
-  .stat-number { font-size: clamp(28px, 8vw, 40px); }
+
+/* Make big numbers impossible to clip */
+.stat-number,
+.campaign-stat-value {
+  line-height: 1.15;
+  overflow: visible;
+  display: inline-block;
+  transform: translateZ(0); /* avoids sub-pixel clipping */
+}
+
+/* If your stat lives inside a card, vertically center it and ensure height */
+.stat-card {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Mobile: extra buffer below the header */
+@media (max-width: 640px) {
+  .section--stats,
+  .stats-section,
+  .stats-grid-wrap { margin-top: clamp(56px, 12vw, 120px); }
+  .stat-card { min-height: 120px; }
 }
 
 </style>
