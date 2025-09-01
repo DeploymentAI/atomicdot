@@ -406,43 +406,72 @@
 
 
 <script>
-  // FluidDotAnimation - Circular Fluid Motion
-  const canvas = document.getElementById('heroCanvas');
-  const ctx = canvas.getContext('2d');
-  let dots = [];
-  let frame = 0;
+// Hero Canvas Animation (main-v2)
+const canvas = document.getElementById('heroCanvas');
+const ctx = canvas.getContext('2d');
+let dots = [];
+let frame = 0;
 
-      function measureSafeRadius(){
-        try{
-          const r = titleEl.getBoundingClientRect();
-          const px = window.devicePixelRatio||1;
-          const margin = 60;
-          safeR = (Math.max(r.width, r.height)/2 + margin) * px;
-        }catch(_){}
+function resizeCanvas() {
+  canvas.width  = window.innerWidth  * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+  canvas.style.width  = window.innerWidth  + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  initDots();
+}
+
+function initDots() {
+  dots = [];
+  const spacing = 30;
+  const cols = Math.floor(canvas.width  / (spacing * devicePixelRatio));
+  const rows = Math.floor(canvas.height / (spacing * devicePixelRatio));
+  for (let x = 0; x < cols; x++) {
+    for (let y = 0; y < rows; y++) {
+      if (Math.random() > 0.5) {
+        dots.push({
+          x: x * spacing * devicePixelRatio,
+          y: y * spacing * devicePixelRatio,
+          baseX: x * spacing * devicePixelRatio,
+          baseY: y * spacing * devicePixelRatio,
+          size: Math.random() * 2 + 1,
+          phase: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.02 + 0.01
+        });
       }
+    }
+  }
+}
 
-      function resize(){
-        W = canvas.width  = window.innerWidth * devicePixelRatio;
-        H = canvas.height = window.innerHeight * devicePixelRatio;
-        canvas.style.width  = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        measureSafeRadius();
-        initDots();
-      }
-      window.addEventListener('resize', resize);
+function animate() {
+  frame += 0.01;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
 
-      function initDots(){
-        dots = [];
-        const cols = Math.floor((W/devicePixelRatio) / gridGap);
-        const rows = Math.floor((H/devicePixelRatio) / gridGap);
-        for(let x=0;x<cols;x++){
-          for(let y=0;y<rows;y++){
-            const px = (x*gridGap + gridGap/2) * devicePixelRatio;
-            const py = (y*gridGap + gridGap/2) * devicePixelRatio;
-            dots.push({ ox:px, oy:py, x:px, y:py, s:0.8+Math.random()*1.6, a:0.15+Math.random()*0.35, p:Math.random()*Math.PI*2, tx:px, ty:py });
-          }
-        }
-        setTargets('grid');
+  dots.forEach((dot, i) => {
+    const angle = frame + dot.phase;
+    const radius = 150 * devicePixelRatio;
+    // Morph between grid and circle
+    const morphFactor = (Math.sin(frame * 0.5) + 1) / 2;
+
+    const circleX = cx + Math.cos(angle) * radius;
+    const circleY = cy + Math.sin(angle) * radius;
+
+    dot.x = dot.baseX * (1 - morphFactor) + circleX * morphFactor;
+    dot.y = dot.baseY * (1 - morphFactor) + circleY * morphFactor;
+
+    ctx.fillStyle = `rgba(10,10,10,${0.3 + Math.sin(frame + i * 0.1) * 0.2})`;
+    ctx.beginPath();
+    ctx.arc(dot.x, dot.y, dot.size * devicePixelRatio, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', resizeCanvas, {passive:true});
+resizeCanvas();
+animate();
 
 
         // Service Icon Animations
