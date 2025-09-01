@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Proof Protocol - AtomicDot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #0a0a0a;
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-400: #999999;
+            --gray-600: #666666;
+            --gray-900: #0a0a0a;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 8px 32px rgba(0,0,0,0.06);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            background: var(--white);
+            color: var(--primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #2a2a2a 100%);
+            color: var(--white);
+            padding: 100px 0 80px;
+            position: relative;
+            overflow: hidden;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        #headerCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: -60px;
+            left: 0;
+            color: var(--white);
+            opacity: 0.7;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        
+        .back-btn:hover {
+            opacity: 1;
+            transform: translateX(-4px);
+        }
+        
+        .header h1 {
+            font-size: clamp(36px, 5vw, 64px);
+            font-weight: 200;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        
+        .header-sub {
+            font-size: clamp(16px, 2.5vw, 20px);
+            opacity: 0.9;
+            margin-bottom: 32px;
+            font-weight: 300;
+        }
+        
+        .contract-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Main Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            margin: -60px auto 80px;
+            max-width: 1200px;
+            padding: 0 24px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 200;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--gray-600);
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            font-weight: 400;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        /* Content Sections */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-section {
+            background: var(--gray-50);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .form-section h2 {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        
+        .form-section p {
+            color: var(--gray-600);
+            margin-bottom: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-connect {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Results */
+        .result-box, .error-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .result-box {
+            background: #f0f9f0;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+        }
+        
+        .error-box {
+            background: #fff3f3;
+            border: 1px solid #f44336;
+            color: #c62828;
+        }
+        
+        /* Integration Code */
+        .code-block {
+            background: #1a1a1a;
+            color: #4caf50;
+            padding: 24px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 20px;
+        }
+        
+        /* Campaign List */
+        .campaigns-list {
+            display: grid;
+            gap: 24px;
+        }
+        
+        .campaign-item {
+            background: var(--white);
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .campaign-item:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
+        }
+        
+        .campaign-info h3 {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        
+        .campaign-meta {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        .campaign-stats {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .campaign-stat {
+            text-align: center;
+        }
+        
+        .campaign-stat-value {
+            font-size: 24px;
+            font-weight: 300;
+            display: block;
+        }
+        
+        .campaign-stat-label {
+            font-size: 11px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+        }
+        
+        /* How it Works */
+        .how-it-works {
+            margin: 80px 0;
+            padding: 60px;
+            background: var(--gray-50);
+            border-radius: 16px;
+        }
+        
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 200;
+            margin-bottom: 48px;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        
+        .step {
+            text-align: center;
+        }
+        
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .step h3 {
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        
+        .step p {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .campaign-item {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .campaign-stats {
+                justify-content: center;
+            }
+            
+            .how-it-works {
+                padding: 40px 24px;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+        }
+    
+/* --- Anti-cropping fixes (minimal) --- */
+.stat-number { 
+  line-height: 1.15; 
+  overflow: visible; 
+  display: inline-block;
+  transform: translateZ(0); /* avoid subpixel clipping on some browsers */
+}
+.stat-card {
+  min-height: 140px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center;
+}
+.campaign-stat-value {
+  line-height: 1.2;
+  overflow: visible;
+  display: inline-block;
+}
+/* Make header text never collide with canvas on mobile */
+@media (max-width: 640px) {
+  .header { padding: 120px 0 80px; }
+  .header h1 { font-size: clamp(32px, 8vw, 56px); }
+  .header-sub { font-size: clamp(14px, 4.5vw, 18px); }
+  .stat-card { min-height: 120px; }
+}
+/* Ensure stats section doesn't clip inner content */
+.stats-section, .stats-grid { overflow: visible; }
+/* Slightly reduce the max scale of animated numbers on very tiny viewports */
+@media (max-width: 360px) {
+  .stat-number { font-size: clamp(28px, 8vw, 40px); }
+}
+
+</style>
+</head>
+<body>
+    <div class="header">
+        <canvas id="headerCanvas"></canvas>
+        <div class="header-content">
+            <a href="/" class="back-btn">← Back to AtomicDot</a>
+            <h1>Ad Proof Protocol™</h1>
+            <p class="header-sub">Blockchain verification for transparent advertising results</p>
+            <div class="contract-badge">
+                0x9deb55540d1587b08ac4ddc40e3f285b453b9341
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="totalImpressions">0</span>
+                <div class="stat-label">Protocol Interactions</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="activeCampaigns">0</span>
+                <div class="stat-label">Registrations</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="publisherCount">0</span>
+                <div class="stat-label">Unique Addresses</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="protocolVolume">Live</span>
+                <div class="stat-label">Network Status</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="advertiser">Create Campaign</button>
+            <button class="tab" data-tab="publisher">Register Content</button>
+            <button class="tab" data-tab="verify">Verify Results</button>
+            <button class="tab" data-tab="dashboard">Live Campaigns</button>
+        </div>
+
+        <!-- Advertiser Tab -->
+        <div class="tab-content active" id="advertiser">
+            <div class="form-section">
+                <h2>Campaign Creation</h2>
+                <p>Deploy a blockchain-verified advertising campaign with transparent metrics</p>
+                
+                <form id="campaignForm">
+                    <div class="form-group">
+                        <label>Campaign Name</label>
+                        <input type="text" id="campaignName" placeholder="Q1 2025 Brand Campaign" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Campaign ID</label>
+                        <input type="text" id="campaignId" placeholder="Auto-generated" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Budget (POL)</label>
+                        <input type="number" id="campaignBudget" placeholder="100" min="1" step="1">
+                    </div>
+                    
+                    <button type="button" class="btn btn-connect" id="connectWallet">Connect MetaMask</button>
+                    
+                    <div id="walletConnected" style="display: none; margin-top: 24px;">
+                        <div class="result-box" style="margin-bottom: 20px;">
+                            <strong>✓ Wallet Connected</strong><br>
+                            Ready for campaign deployment
+                        </div>
+                        <button type="submit" class="btn">Deploy Campaign</button>
+                    </div>
+                </form>
+                
+                <div id="campaignResult"></div>
+            </div>
+        </div>
+
+        <!-- Publisher Tab -->
+        <div class="tab-content" id="publisher">
+            <div class="form-section">
+                <h2>Content Registration</h2>
+                <p>Register your content for verified impression tracking and monetization</p>
+                
+                <form id="contentForm">
+                    <div class="form-group">
+                        <label>Content URL</label>
+                        <input type="url" id="contentUrl" placeholder="https://yoursite.com/content" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Content Type</label>
+                        <select id="contentType">
+                            <option value="display">Display Advertisement</option>
+                            <option value="video">Video Content</option>
+                            <option value="native">Native Article</option>
+                            <option value="podcast">Audio/Podcast</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn">Register Content</button>
+                </form>
+                
+                <div id="contentResult"></div>
+            </div>
+
+            <div class="form-section">
+                <h3>Integration Code</h3>
+                <p>Add this to your website to track verified impressions:</p>
+                
+                <div class="code-block">
+&lt;script src="https://atomicdot.com/adproof.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  AdProof.init({
+    contentId: 'YOUR_CONTENT_ID',
+    publisherAddress: 'YOUR_WALLET_ADDRESS',
+    contractAddress: '0x9deb55540d1587b08ac4ddc40e3f285b453b9341'
+  });
+  
+  // Track when content is viewed
+  AdProof.trackView({
+    campaignId: 'CAMPAIGN_ID',
+    viewDuration: viewDurationInSeconds,
+    sessionProof: generateSessionProof()
+  });
+&lt;/script&gt;</div>
+            </div>
+        </div>
+
+        <!-- Verify Tab -->
+        <div class="tab-content" id="verify">
+            <div class="form-section">
+                <h2>Campaign Verification</h2>
+                <p>Verify any campaign's performance directly on the Polygon blockchain</p>
+                
+                <form id="verifyForm">
+                    <div class="form-group">
+                        <label>Campaign ID or Transaction Hash</label>
+                        <input type="text" id="verifyId" placeholder="0x..." required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Verify on Blockchain</button>
+                </form>
+                
+                <div id="verifyResult"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-content" id="dashboard">
+            <h2 style="margin-bottom: 32px; font-weight: 400;">Live Campaign Examples</h2>
+            
+            <div class="campaigns-list">
+                <div class="campaign-item">
+                    <div class="campaign-info">
+                        <h3>Nike Spring Collection</h3>
+                        <div class="campaign-meta">Campaign ID: 0x7f3a... • Active since Jan 15</div>
+                    </div>
+                    <div class="campaign-stats">
+                        <div class="campaign-stat">
+                            <span class="campaign-stat-value">12,847</span>
+                            <span class="campaign-stat-label">Verified Views</span>
+                        </div>
+                        <div class="campaign-stat">
+                            <span class="campaign-stat-value">3.2%</span>
+                            <span class="campaign-stat-label">Engagement</span>
+                        </div>
+                        <div class="campaign-stat">
+                            <span class="campaign-stat-value">94.2%</span>
+                            <span class="campaign-stat-label">Verification Rate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="campaign-item">
+                    <div class="campaign-info">
+                        <h3>TechCrunch Sponsored Content</h3>
+                        <div class="campaign-meta">Campaign ID: 0x4d8e... • Active since Jan 20</div>
+                    </div>
+                    <div class="campaign-stats">
+                        <div class="campaign-stat">
+                            <span class="campaign-stat-value">5,621</span>
+                            <span class="campaign-stat-label">Verified Views</span>
+                        </div>
+                        <div class="campaign-stat">
+                            <span class="campaign-stat-value">4.1%</span>
+                            <span class="campaign-stat-label">Engagement</span>
+                        </div>
+                        <div class="campaign-stat">
+                            <span class="campaign-stat-value">97.8%</span>
+                            <span class="campaign-stat-label">Verification Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="how-it-works">
+            <h2>How Verification Works</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Connect Wallet</h3>
+                    <p>Connect MetaMask to Polygon network for gas-efficient transactions</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Deploy Campaign</h3>
+                    <p>Create campaign smart contract with defined budget and verification rules</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Track Views</h3>
+                    <p>Every impression recorded on-chain with cryptographic proof of viewing</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Automatic Settlement</h3>
+                    <p>Publishers paid instantly based on verified impression delivery</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Header animation - verification grid
+        const headerCanvas = document.getElementById('headerCanvas');
+        const hctx = headerCanvas.getContext('2d');
+        let headerFrame = 0;
+        
+        function resizeHeader() {
+            headerCanvas.width = headerCanvas.offsetWidth * devicePixelRatio;
+            headerCanvas.height = headerCanvas.offsetHeight * devicePixelRatio;
+        }
+        resizeHeader();
+window.addEventListener('resize', resizeHeader);
+window.addEventListener('orientationchange', resizeHeader);
+        
+        function animateHeader() {
+            headerFrame += 0.01;
+            hctx.clearRect(0, 0, headerCanvas.width, headerCanvas.height);
+            
+            const spacing = 40 * devicePixelRatio;
+            const cols = Math.floor(headerCanvas.width / spacing);
+            const rows = Math.floor(headerCanvas.height / spacing);
+            
+            for (let x = 0; x < cols; x++) {
+                for (let y = 0; y < rows; y++) {
+                    if (Math.random() > 0.8) {
+                        const posX = x * spacing + spacing/2;
+                        const posY = y * spacing + spacing/2;
+                        const size = (2 + Math.sin(headerFrame + x + y) * 1) * devicePixelRatio;
+                        const alpha = 0.3 + Math.sin(headerFrame * 2 + x * y * 0.1) * 0.2;
+                        
+                        hctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                        hctx.beginPath();
+                        hctx.arc(posX, posY, size, 0, Math.PI * 2);
+                        hctx.fill();
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animateHeader);
+        }
+        animateHeader();
+        
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // Generate campaign ID
+        function generateCampaignId() {
+            return '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+        
+        document.getElementById('campaignName').addEventListener('input', (e) => {
+            if (e.target.value) {
+                document.getElementById('campaignId').value = generateCampaignId();
+            }
+        });
+        
+        // Connect wallet simulation
+        document.getElementById('connectWallet').addEventListener('click', () => {
+            setTimeout(() => {
+                document.getElementById('connectWallet').style.display = 'none';
+                document.getElementById('walletConnected').style.display = 'block';
+            }, 1000);
+        });
+        
+        // Form submissions
+        document.getElementById('campaignForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const result = document.getElementById('campaignResult');
+            result.innerHTML = `
+                <div class="result-box">
+                    <strong>Campaign Deployed Successfully</strong><br>
+                    Campaign ID: ${document.getElementById('campaignId').value}<br>
+                    Network: Polygon Mainnet<br>
+                    Status: Ready for impression tracking<br>
+                    <small>Note: This is a demonstration interface. Connect to live network for actual deployment.</small>
+                </div>
+            `;
+        });
+        
+        document.getElementById('contentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const contentId = generateCampaignId();
+            const result = document.getElementById('contentResult');
+            result.innerHTML = `
+                <div class="result-box">
+                    <strong>Content Registered Successfully</strong><br>
+                    Content ID: ${contentId}<br>
+                    URL: ${document.getElementById('contentUrl').value}<br>
+                    Type: ${document.getElementById('contentType').value}<br>
+                    Status: Ready for monetization
+                </div>
+            `;
+        });
+        
+        document.getElementById('verifyForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const result = document.getElementById('verifyResult');
+            result.innerHTML = `
+                <div class="result-box">
+                    <strong>Verification Complete</strong><br>
+                    Searching Polygon network for: ${document.getElementById('verifyId').value}<br>
+                    <a href="https://polygonscan.com/address/0x9deb55540d1587b08ac4ddc40e3f285b453b9341" 
+                       target="_blank" style="color: #2e7d32;">
+                        View on Polygonscan →
+                    </a>
+                </div>
+            `;
+        });
+        
+        // Animate stats
+        function animateNumber(id, target, prefix = '') {
+            const element = document.getElementById(id);
+            if (!element) return;
+            
+            let current = 0;
+            const increment = target / 60;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = prefix + Math.floor(current).toLocaleString();
+            }, 50);
+        }
+        
+        // Simulate some activity after page load
+        setTimeout(() => {
+            animateNumber('totalImpressions', 1247);
+            animateNumber('activeCampaigns', 12);
+            animateNumber('publisherCount', 28);
+        }, 1000);
+    </script>
+</body>
+</html>
