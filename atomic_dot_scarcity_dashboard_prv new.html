@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AtomicDot · Scarcity Dashboard (Preview)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{--ink:#0a0a0a;--muted:#666;--line:#eee;--bg:#fff}
+  html,body{height:100%}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:24px}
+  h1{font-weight:400;letter-spacing:-.02em;margin:8px 0 4px}
+  p.sub{margin:0 0 16px;color:#222}
+  .card{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 12px}
+  .btn{appearance:none;border:1px solid #ddd;background:#fff;border-radius:999px;padding:10px 14px;cursor:pointer;font:inherit}
+  .btn:hover{background:#f8f8f8}
+  .btn[aria-pressed="true"]{background:#111;color:#fff;border-color:#111}
+  select.btn{padding-right:28px}
+  .hint{font-size:12px;color:#666}
+  #stage{width:100%;height:min(62vh,560px);border-radius:12px;display:block;background:#fafafa}
+  .row{display:flex;gap:8px;align-items:center}
+  .legend{display:flex;gap:8px;align-items:center;font-size:12px;color:#555}
+  .chip{display:inline-flex;gap:6px;align-items:center;padding:4px 8px;border:1px solid #e6e6e6;border-radius:999px}
+  .dot{width:10px;height:10px;border-radius:50%;background:#111;display:inline-block}
+  .muted{color:#666}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Scarcity Intelligence</h1>
+    <p class="sub">Tracking the real sources of environmental destruction</p>
+
+    <div class="card">
+      <div class="controls">
+        <select id="country" class="btn" title="Country">
+          <option value="global">Global</option>
+          <option>United States</option><option>Brazil</option><option>United Kingdom</option><option>Switzerland</option>
+          <option>China</option><option>Indonesia</option><option>Australia</option><option>Thailand</option>
+        </select>
+        <button class="btn" id="all" aria-pressed="true">All</button>
+        <button class="btn" id="energy">Energy</button>
+        <button class="btn" id="agri">Agri</button>
+        <button class="btn" id="steel">Steel</button>
+        <span class="legend" style="margin-left:auto"><span class="chip"><span class="dot" style="background:#111"></span>site</span><span class="chip"><span class="dot" style="background:#1a73e8"></span>you</span><span class="chip"><span class="dot" style="background:#111;opacity:.15"></span>grid</span></span>
+      </div>
+      <div class="controls">
+        <button class="btn" id="toggleOutline" aria-pressed="true">Outline: On</button>
+        <button class="btn" id="toggleGrid" aria-pressed="true">Graticule: On</button>
+        <span class="hint">Light country outlines for orientation. Fully on-brand.</span>
+      </div>
+      <canvas id="stage" aria-label="Scarcity map"></canvas>
+    </div>
+  </div>
+
+<script>
+// ----------------------- helpers & state -----------------------
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const DPR = window.devicePixelRatio || 1;
+let W = 0, H = 0, frame = 0;
+let showOutline = true, showGrid = true;
+let currentType = 'all';
+let currentCountry = 'global';
+let mouse = {x: -1, y: -1};
+
+const TYPES = ['energy','agri','steel'];
+
+// Minimal sample data (lat,lon roughly placed)
+const sites = [
+  {name:'Shanxi Coal',lat:38,lng:112,type:'energy',score:0.9},
+  {name:'Guangdong Refinery',lat:23,lng:113,type:'energy',score:0.7},
+  {name:'Beijing Steel',lat:40,lng:116,type:'steel',score:0.6},
+  {name:'US Gulf Rig',lat:29,lng:-90,type:'energy',score:0.8},
+  {name:'Ohio Steel',lat:41,lng:-81,type:'steel',score:0.55},
+  {name:'Cerrado Soy',lat:-12,lng:-50,type:'agri',score:0.75},
+  {name:'Amazon Logging',lat:-4,lng:-62,type:'agri',score:0.85},
+  {name:'North Sea Platform',lat:58,lng:1,type:'energy',score:0.6},
+  {name:'Midlands Foundry',lat:53,lng:-1.5,type:'steel',score:0.5},
+  {name:'Palm Sumatra',lat:0.5,lng:101,type:'agri',score:0.7},
+  {name:'Nickel Sulawesi',lat:-2,lng:121,type:'steel',score:0.65},
+  {name:'Pilbara Mine',lat:-22,lng:119,type:'steel',score:0.8},
+  {name:'Bangkok Feed',lat:14,lng:100,type:'agri',score:0.55}
+];
+
+// quick country bounds (orientation-level only)
+function guessCountry(lat,lng){
+  if(lat>=24 && lat<=49 && lng>=-125 && lng<=-66) return 'United States';
+  if(lat>=-35 && lat<=5 && lng>=-74 && lng<=-34) return 'Brazil';
+  if(lat>=49 && lat<=61 && lng>=-8 && lng<=2) return 'United Kingdom';
+  if(lat>=45 && lat<=48 && lng>=5 && lng<=11) return 'Switzerland';
+  if(lat>=18 && lat<=54 && lng>=73 && lng<=135) return 'China';
+  if(lat>=-11 && lat<=6 && lng>=95 && lng<=141) return 'Indonesia';
+  if(lat>=-44 && lat<=-9 && lng>=112 && lng<=154) return 'Australia';
+  if(lat>=5 && lat<=21 && lng>=97 && lng<=106) return 'Thailand';
+  return 'Global';
+}
+
+function lonToX(lon){ return (lon + 180) / 360 * W }
+function latToY(lat){ const c = Math.max(-85, Math.min(85, lat)); return (1 - (c + 85)/170) * H }
+
+function resize(){
+  const r = canvas.getBoundingClientRect();
+  W = Math.max(300, Math.floor(r.width));
+  H = Math.max(260, Math.floor(r.height));
+  canvas.width = Math.floor(W * DPR);
+  canvas.height = Math.floor(H * DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+new ResizeObserver(resize).observe(canvas); resize();
+
+// ----------------------- drawing -----------------------
+function drawDotGrid(){
+  ctx.save();
+  const gap = 24;
+  ctx.fillStyle = '#e9e9e9';
+  for(let x=gap/2; x<W; x+=gap){
+    for(let y=gap/2; y<H; y+=gap){
+      ctx.beginPath(); ctx.arc(x,y,1.15,0,Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+// Simplified country silhouettes
+const COUNTRY_SHAPES = {
+  'United States': [
+    [[-125,49],[-117,49],[-111,47],[-113,43],[-118,35],[-114,32],[-109,31],[-106,31],[-100,29],[-95,29],[-90,29],[-85,30],[-81,31],[-80,33],[-80,35],[-78,36],[-75,39],[-73,43],[-70,45],[-71,46],[-73,47],[-80,45],[-87,46],[-95,49],[-110,49],[-125,49]]
+  ],
+  'Brazil': [
+    [[-74,-7],[-70,-2],[-60,2],[-50,0],[-44,-5],[-35,-8],[-34,-20],[-40,-30],[-48,-33],[-55,-32],[-60,-20],[-65,-10],[-70,-15],[-74,-7]]
+  ],
+  'United Kingdom': [
+    [[-8,58],[-7,55],[-5,54],[-3,54],[-3,53],[-2,52],[0,51],[2,51],[2,50],[0,50],[-5,50],[-6,51],[-7,52],[-8,55],[-8,58]]
+  ],
+  'Switzerland': [
+    [[5,47.8],[10.5,47.8],[10.5,45.8],[5,45.8],[5,47.8]]
+  ],
+  'China': [
+    [[73,54],[87,49],[97,50],[105,47],[115,45],[122,41],[126,38],[120,25],[110,20],[100,21],[92,25],[86,30],[80,40],[75,45],[73,54]]
+  ],
+  'Indonesia': [
+    [[95,6],[106,6],[108,3],[106,0],[105,-6],[98,-6],[95,0],[95,6]],
+    [[118,2],[125,2],[125,-7],[118,-7],[118,2]]
+  ],
+  'Australia': [
+    [[112,-10],[114,-16],[120,-20],[130,-18],[138,-21],[146,-24],[153,-28],[151,-34],[140,-38],[131,-36],[120,-33],[114,-28],[112,-20],[112,-10]]
+  ],
+  'Thailand': [
+    [[97,21],[101,21],[102,17],[101,14],[101,12],[99,10],[100,8],[101,6],[100,5],[98,7],[98,10],[97,16],[97,21]]
+  ]
+};
+
+function drawWorldFrame(){
+  // graticule
+  if(showGrid){
+    ctx.save();
+    ctx.strokeStyle = '#ededed';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for(let lat=-60; lat<=60; lat+=30){ const y=latToY(lat); ctx.moveTo(0,y); ctx.lineTo(W,y); }
+    for(let lon=-150; lon<=150; lon+=30){ const x=lonToX(lon); ctx.moveTo(x,0); ctx.lineTo(x,H); }
+    ctx.stroke(); ctx.restore();
+  }
+  // country outlines
+  if(showOutline){
+    ctx.save();
+    Object.entries(COUNTRY_SHAPES).forEach(([name,polys])=>{
+      const isFocus = (currentCountry!=='global' && name===currentCountry);
+      ctx.strokeStyle = isFocus ? '#b5c9ff' : '#dcdcdc';
+      ctx.lineWidth = isFocus ? 1.5 : 1;
+      ctx.fillStyle = isFocus ? 'rgba(181,201,255,0.06)' : 'rgba(0,0,0,0.03)';
+      polys.forEach(poly=>{
+        ctx.beginPath();
+        poly.forEach(([lon,lat],i)=>{ const x=lonToX(lon), y=latToY(lat); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+      });
+    });
+    ctx.restore();
+  }
+}
+
+function filteredSites(){
+  return sites.filter(s=>{
+    if(currentType!=='all' && s.type!==currentType) return false;
+    if(currentCountry!=='global' && guessCountry(s.lat,s.lng)!==currentCountry) return false;
+    return true;
+  });
+}
+
+function drawLinks(points){
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<points.length;i++){
+    for(let j=i+1;j<points.length;j++){
+      if(((i*j + i + j) % 7)===0){
+        const a=points[i], b=points[j];
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+function drawSites(points){
+  const t = frame*0.02;
+  points.forEach(p=>{
+    const base = 6 + p.score*10;
+    const pulse = 1.5 + Math.sin(t + p.score*6)*1.5;
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(p.x,p.y,base,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 0.16; ctx.beginPath(); ctx.arc(p.x,p.y,base+pulse*5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+  });
+}
+
+function rrectPath(x,y,w,h,r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr, y);
+  ctx.lineTo(x+w-rr, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+rr);
+  ctx.lineTo(x+w, y+h-rr);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-rr, y+h);
+  ctx.lineTo(x+rr, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-rr);
+  ctx.lineTo(x, y+rr);
+  ctx.quadraticCurveTo(x, y, x+rr, y);
+}
+
+function drawHover(points){
+  const hit = points.find(p => Math.hypot(mouse.x-p.x, mouse.y-p.y) < 12+ p.score*10);
+  if(!hit) return;
+  const label = `${hit.name} · ${hit.type}`;
+  ctx.save();
+  ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+  const pad=6; const tw = Math.ceil(ctx.measureText(label).width);
+  const bx = Math.min(W-12, Math.max(12, hit.x+14));
+  const by = Math.min(H-12, Math.max(12, hit.y-18));
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.strokeStyle = '#e6e6e6';
+  ctx.lineWidth = 1;
+  rrectPath(bx,by, tw+pad*2, 24, 8); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#111'; ctx.fillText(label, bx+pad, by+16);
+  ctx.restore();
+}
+
+function animate(){
+  requestAnimationFrame(animate); frame++;
+  ctx.clearRect(0,0,W,H);
+  drawDotGrid();
+  drawWorldFrame();
+  const pts = filteredSites().map(s=>({ ...s, x: lonToX(s.lng), y: latToY(s.lat) }));
+  drawLinks(pts);
+  drawSites(pts);
+  drawHover(pts);
+}
+requestAnimationFrame(animate);
+
+// ----------------------- UI wiring -----------------------
+canvas.addEventListener('mousemove', e=>{
+  const r = canvas.getBoundingClientRect();
+  mouse.x = (e.clientX - r.left); mouse.y = (e.clientY - r.top);
+});
+
+function setType(type){
+  currentType = type; 
+  TYPES.concat(['all']).forEach(t=>{
+    const el = document.getElementById(t==='all'?'all':t);
+    if(el) el.setAttribute('aria-pressed', String(t===type));
+  });
+}
+['all','energy','agri','steel'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',()=> setType(id==='all'?'all':id));
+});
+
+document.getElementById('country').addEventListener('change', e=>{ currentCountry = e.target.value; });
+
+document.getElementById('toggleOutline').addEventListener('click', e=>{ showOutline = !showOutline; e.currentTarget.setAttribute('aria-pressed', String(showOutline)); });
+
+document.getElementById('toggleGrid').addEventListener('click', e=>{ showGrid = !showGrid; e.currentTarget.setAttribute('aria-pressed', String(showGrid)); });
+</script>
+</body>
+</html>
