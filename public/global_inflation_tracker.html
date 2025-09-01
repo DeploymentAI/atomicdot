@@ -1,387 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AtomicDot – From atoms to outcomes</title>
-  <meta name="description" content="Small senior team. From atoms to outcomes.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inflation Beater - Global Tracker</title>
   <style>
-    /* Reset */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { height:100%; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background:#fff;
-      color:#0a0a0a;
-      line-height:1.5;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      background: #fff;
+      color: #0a0a0a;
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Fluid, no hard separations */
-    nav {
-      position:fixed; top:0; left:0; width:100%;
-      padding:20px 0;
-      background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55) 60%, rgba(255,255,255,0));
-      backdrop-filter:saturate(120%) blur(10px);
-      z-index:10;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
     }
-    .nav-container {
-      max-width:1200px; margin:0 auto; padding:0 24px;
-      display:flex; align-items:center; justify-content:space-between;
+
+    header {
+      text-align: center;
+      padding: 40px 0 32px;
     }
-    .logo { font-weight:500; letter-spacing:-0.02em; font-size:18px; }
-    .nav-menu { display:flex; gap:28px; }
-    .nav-menu a { color:#444; text-decoration:none; font-weight:400; }
-    .nav-menu a:hover { color:#000; }
 
-    /* Hero */
-    .hero {
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      position:relative;
-      overflow:hidden;
+    h1 {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
     }
-    canvas#heroCanvas { position:absolute; inset:0; width:100%; height:100%; }
-    .hero-content { position:relative; z-index:2; text-align:center; padding:0 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-    .hero h1 { font-size:clamp(32px,4.5vw,64px); font-weight:200; letter-spacing:-0.03em; }
-    .hero .sub { margin-top:12px; font-size:18px; color:#555; font-weight:400; }
 
-    /* Sections (no heavy separators) */
-    .section { padding:96px 0; }
-    .container { max-width:1200px; margin:0 auto; padding:0 24px; }
-
-    .section-header { text-align:center; margin-bottom:56px; }
-    .section-header h2 { font-size:clamp(28px,4.2vw,48px); font-weight:300; letter-spacing:-0.02em; }
-    .section-header .kicker { margin-top:8px; color:#666; }
-
-    .services-grid {
-      display:grid; gap:64px;
-      grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      font-weight: 400;
     }
-    .service-item { text-align:center; }
-    .service-visual { width:180px; height:180px; margin:0 auto 20px; }
-    .service-canvas { width:100%; height:100%; display:block; }
-    .service-title { font-size:22px; font-weight:400; letter-spacing:-0.01em; }
-    .service-description { color:#666; font-size:15px; max-width:360px; margin:10px auto 6px; }
-    .service-status { display:inline-block; padding:6px 12px; border:1px solid #ddd; border-radius:999px; font-size:12px; color:#555; }
-    .status-live { background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
 
-    /* Contact block – blended */
-    .contact { background:linear-gradient(180deg, #fff, #fafafa); }
-    .contact-card {
-      max-width:520px; margin:0 auto; background:#fff;
-      border:1px solid #eee; border-radius:12px; padding:36px 28px;
+    /* Main chart container */
+    .chart-container {
+      position: relative;
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 32px;
+      margin: 32px 0;
+      border: 1px solid #eee;
     }
-    .form-group { margin-bottom:18px; text-align:left; }
-    label { display:block; font-size:14px; color:#222; margin-bottom:6px; }
-    input, textarea {
-      width:100%; font:inherit; color:#0a0a0a; background:#fff;
-      border:1px solid #ddd; border-radius:10px; padding:14px 12px;
-      transition:border-color .2s;
-    }
-    input:focus, textarea:focus { outline:none; border-color:#0a0a0a; }
-    .submit-btn {
-      width:100%; border:none; border-radius:10px; padding:14px 14px;
-      background:#0a0a0a; color:#fff; cursor:pointer; font-weight:500;
-    }
-    .submit-btn:hover { opacity:.9; }
 
-    /* Footer (no visual separation) */
-    footer { padding:64px 0 48px; text-align:center; color:#666; font-size:14px; }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
 
-    @media (max-width: 768px){
-      .nav-menu { display:none; }
-      .service-visual { width:150px; height:150px; }
+    .current-rate {
+      font-size: 36px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+
+    .rate-change {
+      font-size: 14px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-left: 16px;
+    }
+
+    .rate-change.positive {
+      background: rgba(220, 38, 127, 0.1);
+      color: #dc267f;
+    }
+
+    .rate-change.negative {
+      background: rgba(255, 188, 66, 0.1);
+      color: #ffbc42;
+    }
+
+    .time-indicators {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .time-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .time-value {
+      font-weight: 500;
+      color: #111;
+    }
+
+    /* Chart canvas */
+    #inflationChart {
+      width: 100%;
+      height: 400px;
+      border-radius: 8px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    .control-btn {
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .control-btn:hover {
+      background: #f8f8f8;
+    }
+
+    .control-btn.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    /* Regional breakdown */
+    .regions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .region-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .region-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .region-name {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #111;
+    }
+
+    .region-rate {
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+    }
+
+    .region-change {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* Animated background dots */
+    .bg-dots {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.05;
+    }
+
+    /* Live indicator */
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #1a73e8;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .chart-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      
+      .time-indicators {
+        justify-content: space-between;
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <nav>
-    <div class="nav-container">
-      <div class="logo">AtomicDot</div>
-      <div class="nav-menu">
-        <a href="#services">Services</a>
-        <a href="#contact">Contact</a>
+  <canvas class="bg-dots" id="bgDots"></canvas>
+  
+  <div class="container">
+    <header>
+      <h1>Inflation Beater</h1>
+      <p class="subtitle">Live global inflation index and the nearest cheaper option for the same product.</p>
+    </header>
+
+    <div class="chart-container">
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        <span>Live</span>
       </div>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <canvas id="heroCanvas"></canvas>
-    <div class="hero-content">
-      <h1>AtomicDot</h1>
-      <p class="sub">From atoms to outcomes.</p>
-    </div>
-  </section>
-
-  <section class="section" id="services">
-    <div class="container">
-      <div class="section-header">
-        <h2>Tiny systems. Real outcomes.</h2>
-        <div class="kicker">Fluid atoms that cohere into shape. Not flashy. Just physics.</div>
-      </div>
-
-      <div class="services-grid">
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="analysis"></canvas></div>
-          <div class="service-title">T&amp;C Decoded</div>
-          <div class="service-description">Legal terms atomised into risk and action.</div>
-          <div class="service-status status-live">Live</div>
+      
+      <div class="chart-header">
+        <div style="display: flex; align-items: center;">
+          <span class="current-rate" id="currentRate">3.24%</span>
+          <span class="rate-change positive" id="rateChange">+0.15%</span>
         </div>
-
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="satellite"></canvas></div>
-          <div class="service-title">Satellite Intelligence</div>
-          <div class="service-description">Rare moments captured ahead of demand.</div>
-          <div class="service-status">Development</div>
-        </div>
-
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="network"></canvas></div>
-          <div class="service-title">Crisis Networks</div>
-          <div class="service-description">Fallback comms for grid-down scenarios.</div>
-          <div class="service-status">Acquisition</div>
-        </div>
-
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="pattern"></canvas></div>
-          <div class="service-title">Pattern Intelligence</div>
-          <div class="service-description">Patent mining and supply chain signals.</div>
-          <div class="service-status">Research</div>
-        </div>
-
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="token"></canvas></div>
-          <div class="service-title">Event Protocol</div>
-          <div class="service-description">Cultural moments as programmable assets.</div>
-          <div class="service-status">Protocol</div>
-        </div>
-
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="water"></canvas></div>
-          <div class="service-title">O2CO2 Solutions</div>
-          <div class="service-description">Energy and water systems for transitions.</div>
-          <div class="service-status">Expanding</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section contact" id="contact">
-    <div class="container">
-      <div class="section-header">
-        <h2>Need an outcome?</h2>
-        <div class="kicker">Book a working session. Leave with a plan.</div>
-      </div>
-      <div class="contact-card">
-        <form id="contactForm">
-          <div class="form-group">
-            <label>Organization</label>
-            <input type="text" name="organization" required />
+        
+        <div class="time-indicators">
+          <div class="time-item">
+            <span>Now</span>
+            <span class="time-value" id="nowRate">3.24%</span>
           </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" required />
+          <div class="time-item">
+            <span>30d</span>
+            <span class="time-value" id="monthRate">3.09%</span>
           </div>
-          <div class="form-group">
-            <label>What outcome do you need?</label>
-            <textarea name="outcome" rows="4" placeholder="Intelligence, infrastructure, protocols, solutions..."></textarea>
+          <div class="time-item">
+            <span>90d</span>
+            <span class="time-value" id="quarterRate">2.98%</span>
           </div>
-          <button class="submit-btn" type="submit">Begin</button>
-        </form>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <footer>
-    <div class="container">
-      © <span id="year"></span> AtomicDot
+      <canvas id="inflationChart"></canvas>
     </div>
-  </footer>
+
+    <div class="controls">
+      <button class="control-btn active" data-period="24h">24H</button>
+      <button class="control-btn" data-period="7d">7D</button>
+      <button class="control-btn" data-period="30d">30D</button>
+      <button class="control-btn" data-period="90d">90D</button>
+      <button class="control-btn" data-period="1y">1Y</button>
+    </div>
+
+    <div class="regions-grid" id="regionsGrid">
+      <!-- Regional data will be populated here -->
+    </div>
+  </div>
 
   <script>
-    // HERO: fluid atoms that periodically form a simple ring shape
-    (function(){
-      const canvas = document.getElementById('heroCanvas');
-      const ctx = canvas.getContext('2d');
-      const titleEl = document.querySelector('.hero-content h1');
-      let W, H, dots = [], gridGap = 22, t = 0, phase = 0;
-      let safeR = 140 * (window.devicePixelRatio||1);
+    // Canvas setup
+    const chart = document.getElementById('inflationChart');
+    const bgCanvas = document.getElementById('bgDots');
+    const bgCtx = bgCanvas.getContext('2d');
+    const ctx = chart.getContext('2d');
+    let currentPeriod = '24h';
+    let animationFrame = 0;
+    let chartData = [];
+    let bgDots = [];
 
-      function measureSafeRadius(){
-        try{
-          const r = titleEl.getBoundingClientRect();
-          const px = window.devicePixelRatio||1;
-          const margin = 60;
-          safeR = (Math.max(r.width, r.height)/2 + margin) * px;
-        }catch(_){}
-      }
+    // Regional inflation data
+    const regions = [
+      { name: 'United States', rate: 3.24, change: '+0.15%', trend: 'up' },
+      { name: 'European Union', rate: 2.87, change: '-0.23%', trend: 'down' },
+      { name: 'United Kingdom', rate: 4.12, change: '+0.08%', trend: 'up' },
+      { name: 'Japan', rate: 1.95, change: '-0.12%', trend: 'down' },
+      { name: 'China', rate: 2.31, change: '+0.05%', trend: 'up' },
+      { name: 'India', rate: 5.68, change: '+0.32%', trend: 'up' },
+      { name: 'Brazil', rate: 4.45, change: '-0.18%', trend: 'down' },
+      { name: 'Australia', rate: 3.89, change: '+0.11%', trend: 'up' }
+    ];
 
-      function resize(){
-        W = canvas.width  = window.innerWidth * devicePixelRatio;
-        H = canvas.height = window.innerHeight * devicePixelRatio;
-        canvas.style.width  = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        measureSafeRadius();
-        initDots();
-      }
-      window.addEventListener('resize', resize);
-
-      function initDots(){
-        dots = [];
-        const cols = Math.floor((W/devicePixelRatio) / gridGap);
-        const rows = Math.floor((H/devicePixelRatio) / gridGap);
-        for(let x=0;x<cols;x++){
-          for(let y=0;y<rows;y++){
-            const px = (x*gridGap + gridGap/2) * devicePixelRatio;
-            const py = (y*gridGap + gridGap/2) * devicePixelRatio;
-            dots.push({ ox:px, oy:py, x:px, y:py, s:0.8+Math.random()*1.6, a:0.15+Math.random()*0.35, p:Math.random()*Math.PI*2, tx:px, ty:py });
-          }
-        }
-        setTargets('grid');
-      }
-
-      function setTargets(mode){
-        const cx = W/2, cy = H/2;
-        if(mode === 'grid'){
-          dots.forEach(d => { d.tx = d.ox; d.ty = d.oy; });
-        } else if(mode === 'ring'){
-          const radius = Math.max(safeR + 100*(devicePixelRatio||1), Math.min(W,H)*0.22);
-          const ringCount = Math.min(dots.length, Math.floor(2*Math.PI*radius / (gridGap*devicePixelRatio*0.9)));
-          for(let i=0;i<dots.length;i++){
-            const j = i % ringCount;
-            const ang = (j / ringCount) * Math.PI*2;
-            const r  = radius + Math.sin(i*0.7)*4;
-            dots[i].tx = cx + Math.cos(ang)*r;
-            dots[i].ty = cy + Math.sin(ang)*r;
-          }
-        }
-      }
-
-      function animate(){
-        t += 0.008;
-        const cycle = (Math.sin(t) + 1)/2;
-        const morph = smoothstep(0.25, 0.75, cycle);
-        const toRing = morph;
-
-        const cx = W/2, cy = H/2;
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle = '#0a0a0a';
-
-        for(let i=0;i<dots.length;i++){
-          const d = dots[i];
-          const gx = d.ox, gy = d.oy;
-          const rx = d.tx, ry = d.ty;
-
-          const wobX = Math.sin(t*2 + d.p + i*0.037) * 4 * devicePixelRatio;
-          const wobY = Math.cos(t*1.6 + d.p + i*0.023) * 3 * devicePixelRatio;
-
-          const bx = lerp(gx, rx, toRing) + wobX;
-          const by = lerp(gy, ry, toRing) + wobY;
-
-          d.x += (bx - d.x) * 0.06;
-          d.y += (by - d.y) * 0.06;
-
-          const dx = d.x - cx, dy = d.y - cy;
-          if (dx*dx + dy*dy < (safeR*safeR)) continue;
-
-          const size = (d.s + Math.sin(t*3 + i*0.12)*0.6) * devicePixelRatio;
-          const alpha = clamp(d.a + Math.sin(t + i*0.05)*0.18, 0.05, 0.9);
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, size, 0, Math.PI*2);
-          ctx.fill();
-        }
-
-        if(cycle < 0.05 && phase !== 0){ phase = 0; setTargets('grid'); }
-        if(cycle > 0.95 && phase !== 1){ phase = 1; setTargets('ring'); }
-
-        requestAnimationFrame(animate);
-      }
-
-      function lerp(a,b,t){ return a + (b-a)*t; }
-      function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-      function smoothstep(edge0, edge1, x){
-        const t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-        return t * t * (3 - 2 * t);
-      }
-
-      resize();
-      setTargets('ring');
-      phase = 1;
-      requestAnimationFrame(animate);
-    })();
-
-    // Mini canvases for services
-    (function(){
-      const canvases = document.querySelectorAll('.service-canvas');
-      const observers = [];
-
-      canvases.forEach((c)=>{
-        const ctx = c.getContext('2d');
-        const size = 180;
-        c.width = size * devicePixelRatio;
-        c.height = size * devicePixelRatio;
-        c.style.width = size+'px';
-        c.style.height = size+'px';
-
-        let t = 0, vis = false;
-        const obs = new IntersectionObserver((es)=>{
-          es.forEach(e=> vis = e.isIntersecting);
+    // Generate chart data
+    function generateInflationData(period) {
+      const points = period === '24h' ? 48 : period === '7d' ? 168 : period === '30d' ? 720 : period === '90d' ? 2160 : 8760;
+      const data = [];
+      let baseRate = 3.24;
+      
+      for (let i = 0; i < points; i++) {
+        // Add realistic inflation fluctuations
+        const volatility = Math.sin(i * 0.1) * 0.05 + Math.random() * 0.02 - 0.01;
+        baseRate += volatility;
+        baseRate = Math.max(1.5, Math.min(6.0, baseRate)); // Keep within realistic bounds
+        
+        data.push({
+          time: i,
+          rate: baseRate,
+          volume: Math.random() * 100 + 50
         });
-        obs.observe(c);
-        observers.push(obs);
+      }
+      
+      return data;
+    }
 
-        function draw(){
-          if(!vis){ requestAnimationFrame(draw); return; }
-          t += 0.02;
-          const W = c.width, H = c.height;
-          const ctx2 = ctx;
-          ctx2.clearRect(0,0,W,H);
-          ctx2.fillStyle = '#0a0a0a';
-          const cx = W/2, cy = H/2;
+    // Background dots animation
+    function initBgDots() {
+      bgCanvas.width = window.innerWidth;
+      bgCanvas.height = window.innerHeight;
+      
+      bgDots = [];
+      const numDots = Math.floor((window.innerWidth * window.innerHeight) / 15000);
+      
+      for (let i = 0; i < numDots; i++) {
+        bgDots.push({
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
+          baseX: Math.random() * bgCanvas.width,
+          baseY: Math.random() * bgCanvas.height,
+          size: Math.random() * 2 + 1,
+          phase: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.005 + 0.001
+        });
+      }
+    }
 
-          // Generic orbiting dots
-          for(let ring=0; ring<3; ring++){
-            const r = (32 + ring*22) * devicePixelRatio;
-            const points = 8 + ring*4;
-            for(let i=0;i<points;i++){
-              const a = i/points * Math.PI*2 + t*(0.8 + ring*0.2);
-              const x = cx + Math.cos(a)*r + Math.sin(t*1.7 + i)*3*devicePixelRatio;
-              const y = cy + Math.sin(a)*r + Math.cos(t*1.3 + i)*2*devicePixelRatio;
-              const s = (3 - ring*0.6) * devicePixelRatio;
-              ctx2.globalAlpha = 0.6 + Math.sin(t+i)*0.3;
-              ctx2.beginPath();
-              ctx2.arc(x,y,s,0,Math.PI*2);
-              ctx2.fill();
-            }
-          }
-          // Core
-          ctx2.globalAlpha = 1;
-          ctx2.beginPath();
-          ctx2.arc(cx, cy, 6*devicePixelRatio, 0, Math.PI*2);
-          ctx2.fill();
-
-          requestAnimationFrame(draw);
-        }
-        draw();
+    function animateBgDots() {
+      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      
+      bgDots.forEach(dot => {
+        dot.phase += dot.speed;
+        dot.x = dot.baseX + Math.sin(dot.phase) * 20;
+        dot.y = dot.baseY + Math.cos(dot.phase * 0.7) * 15;
+        
+        bgCtx.fillStyle = '#000';
+        bgCtx.beginPath();
+        bgCtx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+        bgCtx.fill();
       });
-    })();
+    }
 
-    // Form
-    document.getElementById('contactForm').addEventListener('submit', function(e){
-      e.preventDefault();
-      const data = new FormData(e.target);
-      const subject = encodeURIComponent('AtomicDot – Inquiry from ' + (data.get('organization')||'Unknown'));
-      const body = encodeURIComponent(
-        `Organization: ${data.get('organization')}\nEmail: ${data.get('email')}\n\nDesired Outcome:\n${data.get('outcome')||''}`
-      );
-      location.href = `mailto:hello@atomicdot.com?subject=${subject}&body=${body}`;
+    // Chart drawing
+    function drawChart() {
+      const rect = chart.parentElement.getBoundingClientRect();
+      chart.width = (rect.width - 64) * devicePixelRatio;
+      chart.height = 400 * devicePixelRatio;
+      chart.style.width = (rect.width - 64) + 'px';
+      chart.style.height = '400px';
+      
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+      
+      const width = chart.width / devicePixelRatio;
+      const height = chart.height / devicePixelRatio;
+      const padding = { top: 20, right: 20, bottom: 40, left: 60 };
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+      
+      if (chartData.length === 0) return;
+      
+      // Calculate bounds
+      const minRate = Math.min(...chartData.map(d => d.rate)) * 0.98;
+      const maxRate = Math.max(...chartData.map(d => d.rate)) * 1.02;
+      
+      // Draw grid lines
+      ctx.strokeStyle = '#f0f0f0';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      
+      // Horizontal grid lines
+      for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (height - padding.top - padding.bottom) * i / 5;
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+      }
+      
+      // Vertical grid lines
+      for (let i = 0; i <= 6; i++) {
+        const x = padding.left + (width - padding.left - padding.right) * i / 6;
+        ctx.moveTo(x, padding.top);
+        ctx.lineTo(x, height - padding.bottom);
+      }
+      
+      ctx.stroke();
+      
+      // Draw axis labels
+      ctx.fillStyle = '#999';
+      ctx.font = '11px system-ui';
+      ctx.textAlign = 'right';
+      
+      for (let i = 0; i <= 5; i++) {
+        const rate = minRate + (maxRate - minRate) * (5 - i) / 5;
+        const y = padding.top + (height - padding.top - padding.bottom) * i / 5;
+        ctx.fillText(rate.toFixed(2) + '%', padding.left - 10, y + 4);
+      }
+      
+      // Draw inflation line with animation
+      const animationProgress = (animationFrame % 120) / 120;
+      const visiblePoints = Math.floor(chartData.length * (0.7 + 0.3 * animationProgress));
+      
+      ctx.strokeStyle = '#1a73e8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      for (let i = 0; i < Math.min(visiblePoints, chartData.length); i++) {
+        const data = chartData[i];
+        const x = padding.left + (width - padding.left - padding.right) * i / (chartData.length - 1);
+        const y = padding.top + (height - padding.top - padding.bottom) * (1 - (data.rate - minRate) / (maxRate - minRate));
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      
+      ctx.stroke();
+      
+      // Draw area fill
+      if (visiblePoints > 1) {
+        const gradient = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+        gradient.addColorStop(0, 'rgba(26, 115, 232, 0.1)');
+        gradient.addColorStop(1, 'rgba(26, 115, 232, 0.01)');
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        
+        // Start from bottom left
+        const firstX = padding.left;
+        const firstY = padding.top + (height - padding.top - padding.bottom) * (1 - (chartData[0].rate - minRate) / (maxRate - minRate));
+        ctx.moveTo(firstX, height - padding.bottom);
+        ctx.lineTo(firstX, firstY);
+        
+        // Draw the line
+        for (let i = 1; i < Math.min(visiblePoints, chartData.length); i++) {
+          const data = chartData[i];
+          const x = padding.left + (width - padding.left - padding.right) * i / (chartData.length - 1);
+          const y = padding.top + (height - padding.top - padding.bottom) * (1 - (data.rate - minRate) / (maxRate - minRate));
+          ctx.lineTo(x, y);
+        }
+        
+        // Close the path at bottom
+        const lastX = padding.left + (width - padding.left - padding.right) * (Math.min(visiblePoints, chartData.length) - 1) / (chartData.length - 1);
+        ctx.lineTo(lastX, height - padding.bottom);
+        ctx.closePath();
+        ctx.fill();
+      }
+      
+      // Draw current value indicator
+      if (chartData.length > 0) {
+        const currentData = chartData[chartData.length - 1];
+        const x = width - padding.right;
+        const y = padding.top + (height - padding.top - padding.bottom) * (1 - (currentData.rate - minRate) / (maxRate - minRate));
+        
+        // Pulsing dot
+        const pulse = 1 + Math.sin(animationFrame * 0.2) * 0.3;
+        
+        ctx.fillStyle = 'rgba(26, 115, 232, 0.3)';
+        ctx.beginPath();
+        ctx.arc(x, y, 8 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#1a73e8';
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Update regional data
+    function updateRegions() {
+      const grid = document.getElementById('regionsGrid');
+      grid.innerHTML = regions.map(region => `
+        <div class="region-card">
+          <div class="region-name">${region.name}</div>
+          <div class="region-rate">${region.rate}%</div>
+          <div class="region-change">${region.change}</div>
+        </div>
+      `).join('');
+    }
+
+    // Simulate live updates
+    function updateLiveData() {
+      const change = (Math.random() - 0.5) * 0.02;
+      const newRate = parseFloat(document.getElementById('currentRate').textContent) + change;
+      const clampedRate = Math.max(1.0, Math.min(8.0, newRate));
+      
+      document.getElementById('currentRate').textContent = clampedRate.toFixed(2) + '%';
+      document.getElementById('nowRate').textContent = clampedRate.toFixed(2) + '%';
+      
+      const changeEl = document.getElementById('rateChange');
+      const changeValue = change >= 0 ? `+${change.toFixed(3)}%` : `${change.toFixed(3)}%`;
+      changeEl.textContent = changeValue;
+      changeEl.className = `rate-change ${change >= 0 ? 'positive' : 'negative'}`;
+      
+      // Update regions occasionally
+      if (Math.random() < 0.1) {
+        regions.forEach(region => {
+          const regionChange = (Math.random() - 0.5) * 0.05;
+          region.rate = Math.max(1.0, Math.min(8.0, region.rate + regionChange));
+          region.change = regionChange >= 0 ? `+${regionChange.toFixed(2)}%` : `${regionChange.toFixed(2)}%`;
+        });
+        updateRegions();
+      }
+    }
+
+    // Animation loop
+    function animate() {
+      animationFrame++;
+      drawChart();
+      animateBgDots();
+      
+      // Update live data every 3 seconds
+      if (animationFrame % 180 === 0) {
+        updateLiveData();
+      }
+      
+      requestAnimationFrame(animate);
+    }
+
+    // Control buttons
+    document.querySelectorAll('.control-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        currentPeriod = e.target.dataset.period;
+        chartData = generateInflationData(currentPeriod);
+        animationFrame = 0; // Reset animation
+      });
     });
 
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // Resize handler
+    window.addEventListener('resize', () => {
+      initBgDots();
+      drawChart();
+    });
+
+    // Initialize
+    initBgDots();
+    chartData = generateInflationData(currentPeriod);
+    updateRegions();
+    animate();
   </script>
 </body>
 </html>
