@@ -405,14 +405,12 @@
     </footer>
 
 
-  <script>
-    // HERO: fluid atoms that periodically form a simple ring shape
-    (function(){
-      const canvas = document.getElementById('heroCanvas');
-      const ctx = canvas.getContext('2d');
-      const titleEl = document.querySelector('.hero-content h1');
-      let W, H, dots = [], gridGap = 22, t = 0, phase = 0;
-      let safeR = 140 * (window.devicePixelRatio||1);
+<script>
+  // FluidDotAnimation - Circular Fluid Motion
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+  let dots = [];
+  let frame = 0;
 
       function measureSafeRadius(){
         try{
