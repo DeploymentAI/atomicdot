@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtomicDot - From Atoms to Outcomes</title>
+    <meta name="description" content="Blockchain protocols and intelligence systems for business.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #0a0a0a;
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-400: #999999;
+            --gray-600: #666666;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 8px 32px rgba(0,0,0,0.06);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            background: var(--white);
+            color: var(--primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8));
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 400;
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-canvas, .service-header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            padding: 0 24px;
+        }
+        
+        .hero h1 {
+            font-size: clamp(32px, 4.5vw, 64px);
+            font-weight: 200;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+        
+        .hero-sub {
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--gray-600);
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: var(--gray-100);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--gray-600);
+            margin-top: 32px;
+            font-family: 'SF Mono', monospace;
+        }
+        
+        /* Services Grid */
+        .services {
+            padding: 100px 0;
+            background: var(--gray-50);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-header h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 200;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+        
+        .section-header p {
+            color: var(--gray-600);
+            font-size: clamp(14px, 2vw, 18px);
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+        
+        .service-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px 32px;
+            text-decoration: none;
+            color: var(--primary);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.06);
+            cursor: pointer;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: rgba(0,0,0,0.1);
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            position: relative;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-50);
+        }
+        
+        .service-canvas {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .service-title {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+        
+        .service-description {
+            color: var(--gray-600);
+            line-height: 1.6;
+            margin-bottom: 24px;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+        
+        .service-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+        
+        .status-live {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Footer */
+        footer {
+            padding: 60px 0;
+            text-align: center;
+            color: var(--gray-600);
+            background: var(--white);
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        
+        .footer-copy {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .footer-tagline {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        /* Service Pages */
+        .service-page {
+            display: none;
+            min-height: 100vh;
+            background: var(--white);
+        }
+        
+        .service-page.active {
+            display: block;
+        }
+        
+        .service-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #2a2a2a 100%);
+            color: var(--white);
+            padding: 80px 0;
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            color: var(--white);
+            opacity: 0.7;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        
+        .back-btn:hover {
+            opacity: 1;
+            transform: translateX(-4px);
+        }
+        
+        .service-header h1 {
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 200;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        
+        .service-header p {
+            font-size: clamp(14px, 2.5vw, 18px);
+            opacity: 0.9;
+            margin-bottom: 32px;
+            font-weight: 300;
+        }
+        
+        .service-content {
+            padding: 80px 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: var(--gray-50);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 20px;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .service-card {
+                padding: 32px 24px;
+            }
+        }
+        
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Site -->
+    <div id="mainSite">
+        <nav>
+            <div class="nav-container">
+                <div class="logo" onclick="showMainSite()">AtomicDot</div>
+                <div class="nav-links">
+                    <a href="#services">Services</a>
+                    <a href="mailto:hello@atomicdot.com">Contact</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <canvas class="hero-canvas" id="heroCanvas"></canvas>
+            <div class="hero-content">
+                <h1>AtomicDot</h1>
+                <p class="hero-sub">From atoms to outcomes</p>
+                <div class="hero-badge">
+                    Contract: 0x9deb55540d1587b08ac4ddc40e3f285b453b9341
+                </div>
+            </div>
+        </section>
+
+        <section class="services" id="services">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Intelligence Systems</h2>
+                    <p>Protocols and dashboards for business outcomes</p>
+                </div>
+                
+                <div class="services-grid">
+                    <div class="service-card" onclick="showService('tc')">
+                        <div class="service-icon">
+                            <canvas class="service-canvas" data-type="tc"></canvas>
+                        </div>
+                        <h3 class="service-title">T&C Decoded</h3>
+                        <p class="service-description">
+                            Legal document analysis with risk scoring and plain language summaries for business decisions.
+                        </p>
+                        <span class="service-status status-live">
+                            <div class="status-indicator"></div>
+                            Live Service
+                        </span>
+                    </div>
+
+                    <div class="service-card" onclick="showService('o2co2')">
+                        <div class="service-icon">
+                            <canvas class="service-canvas" data-type="o2co2"></canvas>
+                        </div>
+                        <h3 class="service-title">O2CO2 Monitor</h3>
+                        <p class="service-description">
+                            Real-time tracking of industrial environmental impact and resource depletion patterns.
+                        </p>
+                        <span class="service-status status-live">
+                            <div class="status-indicator"></div>
+                            Live Dashboard
+                        </span>
+                    </div>
+
+                    <div class="service-card" onclick="showService('adproof')">
+                        <div class="service-icon">
+                            <canvas class="service-canvas" data-type="adproof"></canvas>
+                        </div>
+                        <h3 class="service-title">Ad Proof Protocol</h3>
+                        <p class="service-description">
+                            Blockchain verification for advertising impressions. Smart contracts for transparent campaign results.
+                        </p>
+                        <span class="service-status status-live">
+                            <div class="status-indicator"></div>
+                            Live Protocol
+                        </span>
+                    </div>
+
+                    <div class="service-card" onclick="showService('scarcity')">
+                        <div class="service-icon">
+                            <canvas class="service-canvas" data-type="scarcity"></canvas>
+                        </div>
+                        <h3 class="service-title">Scarcity Intelligence</h3>
+                        <p class="service-description">
+                            Global tracking of industrial pollution sources and environmental destruction patterns.
+                        </p>
+                        <span class="service-status status-live">
+                            <div class="status-indicator"></div>
+                            Live Dashboard
+                        </span>
+                    </div>
+
+                    <div class="service-card" onclick="showService('pattern')">
+                        <div class="service-icon">
+                            <canvas class="service-canvas" data-type="pattern"></canvas>
+                        </div>
+                        <h3 class="service-title">Pattern Intelligence</h3>
+                        <p class="service-description">
+                            Patent mining and supply chain signal detection for competitive business advantage.
+                        </p>
+                        <span class="service-status">
+                            <div class="status-indicator"></div>
+                            Development
+                        </span>
+                    </div>
+
+                    <div class="service-card" onclick="showService('events')">
+                        <div class="service-icon">
+                            <canvas class="service-canvas" data-type="events"></canvas>
+                        </div>
+                        <h3 class="service-title">Event Protocols</h3>
+                        <p class="service-description">
+                            Cultural moments as tradeable blockchain assets with mathematical supply distribution.
+                        </p>
+                        <span class="service-status">
+                            <div class="status-indicator"></div>
+                            Coming Soon
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="container">
+                <p class="footer-copy">© 2025 AtomicDot. Built for the future of business intelligence.</p>
+                <p class="footer-tagline">Access any atom of thought for personal impact.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Service Pages with proper canvas animations -->
+    <div id="tcService" class="service-page">
+        <div class="service-header">
+            <canvas class="service-header-bg" data-service="tc"></canvas>
+            <div class="service-header-content">
+                <a href="#" class="back-btn" onclick="showMainSite()">← Back to AtomicDot</a>
+                <h1>T&C Decoded</h1>
+                <p>Legal document analysis with AI-powered risk assessment</p>
+            </div>
+        </div>
+        <div class="service-content">
+            <div class="container">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚖️</div>
+                        <h3 class="feature-title">Legal Analysis</h3>
+                        <p class="feature-description">AI-powered analysis of legal documents with professional-grade accuracy</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Risk Scoring</h3>
+                        <p class="feature-description">Quantified risk assessment with detailed breakdown of potential issues</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📝</div>
+                        <h3 class="feature-title">Plain English</h3>
+                        <p class="feature-description">Complex legal language translated into clear, actionable summaries</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="o2co2Service" class="service-page">
+        <div class="service-header">
+            <canvas class="service-header-bg" data-service="o2co2"></canvas>
+            <div class="service-header-content">
+                <a href="#" class="back-btn" onclick="showMainSite()">← Back to AtomicDot</a>
+                <h1>O2CO2 Monitor</h1>
+                <p>Real-time environmental intelligence and pollution tracking</p>
+            </div>
+        </div>
+        <div class="service-content">
+            <div class="container">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3 class="feature-title">Global Monitoring</h3>
+                        <p class="feature-description">Real-time tracking of oxygen and carbon dioxide ratios worldwide</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏭</div>
+                        <h3 class="feature-title">Industrial Impact</h3>
+                        <p class="feature-description">Identify major polluters and their environmental footprint</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3 class="feature-title">Trend Analysis</h3>
+                        <p class="feature-description">Predictive modeling of environmental degradation patterns</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="adproofService" class="service-page">
+        <div class="service-header">
+            <canvas class="service-header-bg" data-service="adproof"></canvas>
+            <div class="service-header-content">
+                <a href="#" class="back-btn" onclick="showMainSite()">← Back to AtomicDot</a>
+                <h1>Ad Proof Protocol</h1>
+                <p>Blockchain verification for transparent advertising results</p>
+                <div style="font-family: 'SF Mono', monospace; font-size: 12px; margin-top: 20px; opacity: 0.8;">
+                    Contract: 0x9deb55540d1587b08ac4ddc40e3f285b453b9341
+                </div>
+            </div>
+        </div>
+        <div class="service-content">
+            <div class="container">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <h3 class="feature-title">Blockchain Verified</h3>
+                        <p class="feature-description">Every impression recorded on Polygon with cryptographic proof</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💎</div>
+                        <h3 class="feature-title">Smart Contracts</h3>
+                        <p class="feature-description">Automated campaign management and payment settlement</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Real Metrics</h3>
+                        <p class="feature-description">Eliminate ad fraud with verifiable campaign analytics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scarcityService" class="service-page">
+        <div class="service-header">
+            <canvas class="service-header-bg" data-service="scarcity"></canvas>
+            <div class="service-header-content">
+                <a href="#" class="back-btn" onclick="showMainSite()">← Back to AtomicDot</a>
+                <h1>Scarcity Intelligence</h1>
+                <p>Tracking the real sources of environmental destruction</p>
+            </div>
+        </div>
+        <div class="service-content">
+            <div class="container">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🏭</div>
+                        <h3 class="feature-title">Industrial Tracking</h3>
+                        <p class="feature-description">Monitor major polluters across all sectors</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3 class="feature-title">Global Coverage</h3>
+                        <p class="feature-description">Comprehensive environmental destruction tracking</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Impact Analytics</h3>
+                        <p class="feature-description">Quantified environmental impact scores</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="patternService" class="service-page">
+        <div class="service-header">
+            <canvas class="service-header-bg" data-service="pattern"></canvas>
+            <div class="service-header-content">
+                <a href="#" class="back-btn" onclick="showMainSite()">← Back to AtomicDot</a>
+                <h1>Pattern Intelligence</h1>
+                <p>Patent mining and supply chain signal detection</p>
+            </div>
+        </div>
+        <div class="service-content">
+            <div class="container">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3 class="feature-title">Patent Mining</h3>
+                        <p class="feature-description">Discover valuable expired patents and IP opportunities</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📡</div>
+                        <h3 class="feature-title">Signal Detection</h3>
+                        <p class="feature-description">Early warning system for supply chain disruptions</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">Competitive Edge</h3>
+                        <p class="feature-description">Strategic insights from pattern recognition</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="eventsService" class="service-page">
+        <div class="service-header">
+            <canvas class="service-header-bg" data-service="events"></canvas>
+            <div class="service-header-content">
+                <a href="#" class="back-btn" onclick="showMainSite()">← Back to AtomicDot</a>
+                <h1>Event Protocols</h1>
+                <p>Cultural moments as tradeable blockchain assets</p>
+            </div>
+        </div>
+        <div class="service-content">
+            <div class="container">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📅</div>
+                        <h3 class="feature-title">Event Tokenization</h3>
+                        <p class="feature-description">Convert cultural moments into digital assets</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔢</div>
+                        <h3 class="feature-title">Mathematical Supply</h3>
+                        <p class="feature-description">Token supply determined by event significance</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💎</div>
+                        <h3 class="feature-title">Blockchain Provenance</h3>
+                        <p class="feature-description">Immutable record of cultural significance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        function showMainSite() {
+            document.getElementById('mainSite').style.display = 'block';
+            document.querySelectorAll('.service-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            window.scrollTo(0, 0);
+        }
+        
+        function showService(serviceId) {
+            document.getElementById('mainSite').style.display = 'none';
+            document.querySelectorAll('.service-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            const serviceMap = {
+                'tc': 'tcService',
+                'o2co2': 'o2co2Service',
+                'adproof': 'adproofService',
+                'scarcity': 'scarcityService',
+                'pattern': 'patternService',
+                'events': 'eventsService'
+            };
+            
+            const targetService = document.getElementById(serviceMap[serviceId]);
+            if (targetService) {
+                targetService.style.display = 'block';
+                window.scrollTo(0, 0);
+                initServiceHeaderAnimation(serviceMap[serviceId]);
+            }
+        }
+        
+        // Universal fluid dot animation class
+        class FluidDotAnimation {
+            constructor(canvas, config = {}) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.dots = [];
+                this.frame = 0;
+                this.config = {
+                    dotCount: config.dotCount || 150,
+                    baseSize: config.baseSize || 1.5,
+                    speed: config.speed || 0.01,
+                    morphSpeed: config.morphSpeed || 0.15,
+                    color: config.color || 'rgba(10, 10, 10, 0.3)',
+                    pattern: config.pattern || 'hypnotic'
+                };
+                this.animationId = null;
+                this.resize();
+                this.init();
+            }
+            
+            resize() {
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * devicePixelRatio;
+                this.canvas.height = rect.height * devicePixelRatio;
+                this.ctx.scale(devicePixelRatio, devicePixelRatio);
+                this.canvas.style.width = rect.width + 'px';
+                this.canvas.style.height = rect.height + 'px';
+            }
+            
+            init() {
+                this.dots = [];
+                const spacing = Math.max(25, this.canvas.width / 40);
+                const cols = Math.floor(this.canvas.width / devicePixelRatio / spacing);
+                const rows = Math.floor(this.canvas.height / devicePixelRatio / spacing);
+                
+                for (let x = 0; x < cols; x++) {
+                    for (let y = 0; y < rows; y++) {
+                        if (Math.random() > 0.6) {
+                            this.dots.push({
+                                x: x * spacing + spacing/2,
+                                y: y * spacing + spacing/2,
+                                baseX: x * spacing + spacing/2,
+                                baseY: y * spacing + spacing/2,
+                                size: Math.random() * this.config.baseSize + 0.5,
+                                phase: Math.random() * Math.PI * 2,
+                                speed: Math.random() * 0.02 + 0.005
+                            });
+                        }
+                    }
+                }
+            }
+            
+            animate() {
+                this.frame += this.config.speed;
+                this.ctx.clearRect(0, 0, this.canvas.width / devicePixelRatio, this.canvas.height / devicePixelRatio);
+                
+                const cx = this.canvas.width / devicePixelRatio / 2;
+                const cy = this.canvas.height / devicePixelRatio / 2;
+                
+                if (this.config.pattern === 'hypnotic') {
+                    // Hypnotic circular morph pattern
+                    const morphFactor = (Math.sin(this.frame * this.config.morphSpeed) + 1) / 2;
+                    
+                    this.dots.forEach((dot, i) => {
+                        const angle = this.frame * 0.5 + dot.phase;
+                        const radius = Math.min(cx, cy) * 0.3 * morphFactor;
+                        
+                        const circleX = cx + Math.cos(angle) * radius;
+                        const circleY = cy + Math.sin(angle) * radius;
+                        
+                        const blend = morphFactor * 0.4;
+                        dot.x = dot.baseX * (1 - blend) + circleX * blend;
+                        dot.y = dot.baseY * (1 - blend) + circleY * blend;
+                        
+                        // Add subtle wobble
+                        dot.x += Math.sin(this.frame * 2 + i * 0.1) * 2;
+                        dot.y += Math.cos(this.frame * 1.5 + i * 0.1) * 2;
+                        
+                        const alpha = 0.2 + Math.sin(this.frame + i * 0.05) * 0.2;
+                        this.ctx.fillStyle = this.config.color.replace('0.3', alpha);
+                        this.ctx.beginPath();
+                        this.ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    });
+                } else if (this.config.pattern === 'wave') {
+                    // Wave pattern for service headers
+                    this.dots.forEach((dot, i) => {
+                        const wave = Math.sin(this.frame * 2 + dot.baseX * 0.01) * 20;
+                        dot.x = dot.baseX + Math.sin(this.frame + dot.phase) * 5;
+                        dot.y = dot.baseY + wave;
+                        
+                        const alpha = 0.1 + Math.sin(this.frame + i * 0.05) * 0.1;
+                        this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                        this.ctx.beginPath();
+                        this.ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    });
+                }
+                
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+            
+            start() {
+                if (!this.animationId) {
+                    this.animate();
+                }
+            }
+            
+            stop() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+            }
+        }
+        
+        // Initialize hero animation
+        const heroAnimation = new FluidDotAnimation(document.getElementById('heroCanvas'), {
+            dotCount: 200,
+            pattern: 'hypnotic',
+            morphSpeed: 0.1
+        });
+        heroAnimation.start();
+        
+        // Service icon animations
+        document.querySelectorAll('.service-canvas').forEach(canvas => {
+            const ctx = canvas.getContext('2d');
+            const type = canvas.dataset.type;
+            canvas.width = 120;
+            canvas.height = 120;
+            
+            let frame = 0;
+            
+            function drawIcon() {
+                frame += 0.02;
+                ctx.clearRect(0, 0, 120, 120);
+                const cx = 60, cy = 60;
+                
+                if (type === 'tc') {
+                    // Document pattern
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i / 12) * Math.PI * 2 + frame;
+                        const x = cx + Math.cos(angle) * 20;
+                        const y = cy + Math.sin(angle) * 20;
+                        ctx.fillStyle = `rgba(10, 10, 10, ${0.3 + Math.sin(frame + i) * 0.2})`;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (type === 'o2co2') {
+                    // Dual ring pattern
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2 + frame;
+                        const x1 = cx + Math.cos(angle) * 25;
+                        const y1 = cy + Math.sin(angle) * 25;
+                        const x2 = cx + Math.cos(-angle) * 15;
+                        const y2 = cy + Math.sin(-angle) * 15;
+                        
+                        ctx.fillStyle = `rgba(76, 175, 80, ${0.4})`;
+                        ctx.beginPath();
+                        ctx.arc(x1, y1, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.fillStyle = `rgba(244, 67, 54, ${0.4})`;
+                        ctx.beginPath();
+                        ctx.arc(x2, y2, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (type === 'adproof') {
+                    // Verification pattern
+                    for (let ring = 0; ring < 3; ring++) {
+                        const points = 6 + ring * 2;
+                        for (let i = 0; i < points; i++) {
+                            const angle = (i / points) * Math.PI * 2 + frame * (1 - ring * 0.2);
+                            const radius = 10 + ring * 10;
+                            const x = cx + Math.cos(angle) * radius;
+                            const y = cy + Math.sin(angle) * radius;
+                            ctx.fillStyle = `rgba(10, 10, 10, ${0.6 - ring * 0.15})`;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                } else {
+                    // Default orbital pattern
+                    for (let i = 0; i < 10; i++) {
+                        const angle = (i / 10) * Math.PI * 2 + frame;
+                        const radius = 20 + Math.sin(frame + i) * 5;
+                        const x = cx + Math.cos(angle) * radius;
+                        const y = cy + Math.sin(angle) * radius;
+                        ctx.fillStyle = `rgba(10, 10, 10, 0.4)`;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                requestAnimationFrame(drawIcon);
+            }
+            drawIcon();
+        });
+        
+        // Initialize service header animations
+        const serviceAnimations = {};
+        
+        function initServiceHeaderAnimation(serviceId) {
+            const canvas = document.querySelector(`#${serviceId} .service-header-bg`);
+            if (canvas && !serviceAnimations[serviceId]) {
+                serviceAnimations[serviceId] = new FluidDotAnimation(canvas, {
+                    pattern: 'wave',
+                    color: 'rgba(255, 255, 255, 0.2)',
+                    speed: 0.015
+                });
+                serviceAnimations[serviceId].start();
+            }
+        }
+        
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            heroAnimation.resize();
+            heroAnimation.init();
+            
+            Object.values(serviceAnimations).forEach(anim => {
+                anim.resize();
+                anim.init();
+            });
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

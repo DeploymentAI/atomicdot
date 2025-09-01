@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&C Decoded - Legal Analysis Made Simple</title>
+    <meta name="description" content="Instant legal document analysis. Upload terms, get risk scores. Professional grade accuracy for business decisions.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #fff;
+            color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            line-height: 1.5;
+        }
+        
+        /* Navigation */
+        nav {
+            padding: 30px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+        }
+        
+        .logo-parent {
+            color: #666;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .login-btn {
+            color: #666;
+            text-decoration: none;
+            font-weight: 400;
+        }
+        
+        .signup-btn {
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* Hero */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 200;
+            letter-spacing: -0.03em;
+            margin-bottom: 25px;
+        }
+        
+        .hero-sub {
+            font-size: 20px;
+            color: #666;
+            font-weight: 300;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Analyzer Tool */
+        .analyzer {
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+        
+        .upload-zone.dragover {
+            border-color: #000;
+            background: #f0f0f0;
+        }
+        
+        .upload-zone input[type="file"] {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .textarea-input {
+            width: 100%;
+            min-height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+        
+        .analyze-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .analyze-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Results */
+        .results {
+            display: none;
+            margin-top: 40px;
+        }
+        
+        .score-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .score-number {
+            font-size: 48px;
+            font-weight: 200;
+            margin-bottom: 10px;
+        }
+        
+        .score-good { color: #2ecc71; }
+        .score-medium { color: #f39c12; }
+        .score-bad { color: #e74c3c; }
+        
+        .score-label {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .finding-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .finding-title {
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .risk-high {
+            background: #fee;
+            color: #d32f2f;
+        }
+        
+        .risk-medium {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .risk-low {
+            background: #f1f8e9;
+            color: #388e3c;
+        }
+        
+        .finding-explanation {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .text-excerpt {
+            background: #f8f8f8;
+            border-left: 3px solid #ddd;
+            padding: 12px 16px;
+            font-family: ui-monospace, SFMono-Regular, monospace;
+            font-size: 13px;
+            color: #555;
+            border-radius: 4px;
+        }
+        
+        /* Pricing */
+        .pricing {
+            padding: 100px 0;
+            background: #f8f8f8;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .pricing-card.featured {
+            border-color: #000;
+            position: relative;
+        }
+        
+        .pricing-name {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .pricing-price {
+            font-size: 36px;
+            font-weight: 200;
+            margin-bottom: 20px;
+        }
+        
+        .pricing-features {
+            text-align: left;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-features li {
+            margin: 8px 0;
+            list-style: none;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .pricing-features li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #2ecc71;
+        }
+        
+        .pricing-cta {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+        }
+        
+        .pricing-cta.secondary {
+            background: #fff;
+            color: #000;
+            border: 1px solid #ddd;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 60px 0;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .nav-container { padding: 0 20px; }
+            .hero h1 { font-size: 42px; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .footer-links { flex-direction: column; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div>
+                <div class="logo">T&C Decoded</div>
+                <div class="logo-parent">by atomicdot</div>
+            </div>
+            <div class="nav-actions">
+                <a href="#pricing" class="login-btn">Pricing</a>
+                <a href="#analyzer" class="signup-btn">Try Free</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Legal Documents.<br>Decoded Instantly.</h1>
+            <div class="hero-sub">
+                Upload any terms of service, privacy policy, or contract. Get clear risk analysis, plain English summaries, and actionable insights in seconds.
+            </div>
+        </div>
+    </section>
+
+    <section class="analyzer" id="analyzer">
+        <div class="container">
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt">
+                <div>
+                    <h3 style="margin-bottom: 15px; font-weight: 400;">Upload Document</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Drop PDF, Word, or text file here</p>
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        Choose File
+                    </button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0; color: #999;">or</div>
+            
+            <textarea class="textarea-input" id="textInput" placeholder="Paste your terms of service, privacy policy, or contract text here...
+
+Example: Try pasting terms from any major platform (Google, Facebook, Stripe, etc.) to see how it works."></textarea>
+            
+            <button class="analyze-btn" id="analyzeBtn">Decode Document</button>
+            
+            <div class="results" id="results">
+                <div class="score-card">
+                    <div class="score-number" id="scoreNumber">85</div>
+                    <div class="score-label">Fairness Score</div>
+                    <div style="margin-top: 15px; font-size: 14px; color: #666;" id="scoreExplanation">
+                        Score based on transparency, user rights, and balanced obligations
+                    </div>
+                </div>
+                
+                <div class="findings-grid" id="findingsGrid">
+                    <!-- Findings will be populated here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 42px; font-weight: 200; margin-bottom: 20px;">Simple Pricing</h2>
+                <p style="color: #666; font-size: 18px;">Start free. Scale as you need.</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-name">Free</div>
+                    <div class="pricing-price">$0<span style="font-size: 16px; color: #666;">/month</span></div>
+                    <ul class="pricing-features">
+                        <li>3 documents per month</li>
+                        <li>Basic risk analysis</li>
+                        <li>PDF export</li>
+                        <li>Email support</li>
+                    </ul>
+                    <button class="pricing-cta secondary">Start Free</button>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="pricing-name">Professional</div>
+                    <div class="pricing-price">$49<span style="font-size: 16px; color: #666;">/month</span></div>
+                    <ul class="pricing-features">
+                        <li>Unlimited documents</li>
+                        <li>Advanced risk scoring</li>
+                        <li>Clause recommendations</li>
+                        <li>API access</li>
+                        <li>Priority support</li>
+                        <li>Team collaboration</li>
+                    </ul>
+                    <button class="pricing-cta">Start 14-Day Trial</button>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="pricing-name">Enterprise</div>
+                    <div class="pricing-price">Custom</div>
+                    <ul class="pricing-features">
+                        <li>Volume licensing</li>
+                        <li>Custom risk frameworks</li>
+                        <li>On-premise deployment</li>
+                        <li>Integration support</li>
+                        <li>Dedicated success manager</li>
+                        <li>SLA guarantees</li>
+                    </ul>
+                    <button class="pricing-cta secondary">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#privacy">Privacy</a>
+                <a href="#terms">Terms</a>
+                <a href="#security">Security</a>
+                <a href="https://atomicdot.com">atomicdot</a>
+            </div>
+            <p>&copy; 2025 atomicdot. Access any atom of thought for personal impact.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Legal analysis patterns
+        const ANALYSIS_RULES = [
+            {
+                id: 'unilateral_changes',
+                label: 'Unilateral Changes',
+                severity: 'high',
+                weight: 20,
+                explanation: 'Provider can change terms without user consent',
+                pattern: /(change|modify|amend).{0,50}(terms|agreement).{0,50}(any time|at any time|without notice)/i
+            },
+            {
+                id: 'liability_cap',
+                label: 'Liability Limitations', 
+                severity: 'high',
+                weight: 18,
+                explanation: 'Restricts user recovery even if provider is at fault',
+                pattern: /(liability.{0,30}limited|liability.{0,30}shall not exceed|aggregate liability).{0,100}(\$\d+|one hundred|total amount)/i
+            },
+            {
+                id: 'arbitration',
+                label: 'Forced Arbitration',
+                severity: 'medium', 
+                weight: 12,
+                explanation: 'Disputes must go through arbitration instead of courts',
+                pattern: /(arbitration|binding arbitration|arbitral|class action waiver|jury trial waiver)/i
+            },
+            {
+                id: 'data_sharing',
+                label: 'Broad Data Sharing',
+                severity: 'medium',
+                weight: 10,
+                explanation: 'User data may be shared with third parties',
+                pattern: /(share|disclose|provide).{0,40}(information|data).{0,40}(third parties|partners|affiliates|law enforcement)/i
+            },
+            {
+                id: 'termination',
+                label: 'Immediate Termination',
+                severity: 'high',
+                weight: 15,
+                explanation: 'Service can be terminated without notice or cause',
+                pattern: /(terminate|suspend).{0,30}(immediately|without notice|at any time|without cause)/i
+            },
+            {
+                id: 'indemnification',
+                label: 'User Indemnification',
+                severity: 'medium',
+                weight: 8,
+                explanation: 'User must pay for provider\'s legal costs in disputes',
+                pattern: /(indemnif|hold harmless).{0,50}(costs|expenses|damages|claims)/i
+            },
+            {
+                id: 'governing_law',
+                label: 'Foreign Jurisdiction',
+                severity: 'low',
+                weight: 5,
+                explanation: 'Legal disputes governed by potentially inconvenient jurisdiction',
+                pattern: /(governed by|construed under).{0,50}(laws of|jurisdiction of)/i
+            },
+            {
+                id: 'no_warranties',
+                label: 'No Warranties',
+                severity: 'medium',
+                weight: 8,
+                explanation: 'Service provided "as-is" with limited guarantees',
+                pattern: /(as is|no warrant|disclaim.{0,20}warrant|without warrant)/i
+            }
+        ];
+
+        // File upload handling
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const textInput = document.getElementById('textInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const results = document.getElementById('results');
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                let text = e.target.result;
+                
+                // Simple text extraction for different file types
+                if (file.type.includes('html')) {
+                    text = text.replace(/<script[\s\S]*?<\/script>/gi, '')
+                               .replace(/<style[\s\S]*?<\/style>/gi, '')
+                               .replace(/<[^>]+>/g, ' ')
+                               .replace(/\s+/g, ' ');
+                }
+                
+                textInput.value = text;
+                uploadZone.querySelector('p').textContent = `Loaded: ${file.name}`;
+            };
+            reader.readAsText(file);
+        }
+
+        // Analysis engine
+        function analyzeDocument() {
+            const text = textInput.value.trim();
+            if (!text) {
+                alert('Please upload a document or paste text to analyze');
+                return;
+            }
+
+            analyzeBtn.textContent = 'Analyzing...';
+            analyzeBtn.disabled = true;
+
+            setTimeout(() => {
+                const findings = [];
+                let totalPenalties = 0;
+
+                ANALYSIS_RULES.forEach(rule => {
+                    const match = text.match(rule.pattern);
+                    if (match) {
+                        const excerptStart = Math.max(0, match.index - 50);
+                        const excerptEnd = Math.min(text.length, match.index + match[0].length + 100);
+                        const excerpt = text.slice(excerptStart, excerptEnd).trim();
+
+                        findings.push({
+                            ...rule,
+                            excerpt: excerpt,
+                            matchText: match[0]
+                        });
+
+                        totalPenalties += rule.weight;
+                    }
+                });
+
+                const score = Math.max(0, 100 - totalPenalties);
+                displayResults(score, findings);
+
+                analyzeBtn.textContent = 'Decode Document';
+                analyzeBtn.disabled = false;
+            }, 1500); // Simulate processing time
+        }
+
+        function displayResults(score, findings) {
+            const scoreNumber = document.getElementById('scoreNumber');
+            const scoreExplanation = document.getElementById('scoreExplanation');
+            const findingsGrid = document.getElementById('findingsGrid');
+
+            scoreNumber.textContent = score;
+            scoreNumber.className = score >= 80 ? 'score-number score-good' : 
+                                   score >= 60 ? 'score-number score-medium' : 
+                                   'score-number score-bad';
+
+            scoreExplanation.textContent = score >= 80 ? 
+                'This document appears to have balanced terms with reasonable user protections.' :
+                score >= 60 ?
+                'This document has some concerning clauses that may limit your rights.' :
+                'This document contains several clauses that heavily favor the provider.';
+
+            findingsGrid.innerHTML = '';
+
+            if (findings.length === 0) {
+                findingsGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                        <h3 style="margin-bottom: 10px; font-weight: 400;">No Major Issues Found</h3>
+                        <p>This document appears to use standard, balanced language. Always review the complete document for context.</p>
+                    </div>
+                `;
+            } else {
+                findings.forEach(finding => {
+                    const card = document.createElement('div');
+                    card.className = 'finding-card';
+                    card.innerHTML = `
+                        <div class="finding-header">
+                            <div class="finding-title">${finding.label}</div>
+                            <div class="risk-badge risk-${finding.severity}">${finding.severity} risk</div>
+                        </div>
+                        <div class="finding-explanation">${finding.explanation}</div>
+                        <div class="text-excerpt">"${finding.excerpt}"</div>
+                    `;
+                    findingsGrid.appendChild(card);
+                });
+            }
+
+            results.style.display = 'block';
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        analyzeBtn.addEventListener('click', analyzeDocument);
+
+        // Pricing CTAs
+        document.querySelectorAll('.pricing-cta').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const plan = this.closest('.pricing-card').querySelector('.pricing-name').textContent;
+                const subject = encodeURIComponent(`T&C Decoded - ${plan} Plan Inquiry`);
+                const body = encodeURIComponent(`I'm interested in the ${plan} plan for T&C Decoded.\n\nPlease send me setup instructions and payment details.`);
+                window.location.href = `mailto:hello@atomicdot.com?subject=${subject}&body=${body}`;
+            });
+        });
+
+        // Demo with sample text
+        window.addEventListener('load', () => {
+            const demoText = `TERMS OF SERVICE
+
+1. CHANGES TO TERMS
+We may modify these terms at any time without notice to you. Your continued use of our service constitutes acceptance of any changes.
+
+2. LIABILITY LIMITATION  
+Our total liability shall not exceed one hundred US dollars ($100) regardless of the nature of the claim.
+
+3. DISPUTE RESOLUTION
+Any dispute arising from these terms shall be resolved through binding arbitration. You waive your right to jury trial and class action participation.
+
+4. TERMINATION
+We may terminate your account immediately without notice for any reason or no reason.
+
+5. DATA SHARING
+We may share your personal information with third parties, partners, and law enforcement as we determine necessary.`;
+
+            // Auto-populate demo after a short delay
+            setTimeout(() => {
+                if (!textInput.value) {
+                    textInput.value = demoText;
+                    textInput.style.color = '#999';
+                    setTimeout(() => {
+                        textInput.style.color = '#000';
+                    }, 2000);
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

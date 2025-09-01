@@ -1,390 +1,571 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AtomicDot – From atoms to outcomes</title>
-  <meta name="description" content="Small senior team. From atoms to outcomes.">
-  <style>
-    /* Reset */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { height:100%; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background:#fff;
-      color:#0a0a0a;
-      line-height:1.5;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtomicDot - Atoms for Outcomes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Fluid, no hard separations */
-    nav {
-      position:fixed; top:0; left:0; width:100%;
-      padding:20px 0;
-      background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55) 60%, rgba(255,255,255,0));
-      backdrop-filter:saturate(120%) blur(10px);
-      z-index:10;
-    }
-    .nav-container {
-      max-width:1200px; margin:0 auto; padding:0 24px;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .logo { font-weight:500; letter-spacing:-0.02em; font-size:18px; }
-    .nav-menu { display:flex; gap:28px; }
-    .nav-menu a { color:#444; text-decoration:none; font-weight:400; }
-    .nav-menu a:hover { color:#000; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            background: #fff;
+            color: #0a0a0a;
+            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
 
-    /* Hero */
-    .hero {
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      position:relative;
-      overflow:hidden;
-    }
-    canvas#heroCanvas { position:absolute; inset:0; width:100%; height:100%; }
-    .hero-content { position:relative; z-index:2; text-align:center; padding:0 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-    .hero h1 { font-size:clamp(32px,4.5vw,64px); font-weight:200; letter-spacing:-0.03em; }
-    .hero .sub { margin-top:12px; font-size:18px; color:#555; font-weight:400; }
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
 
-    /* Sections (no heavy separators) */
-    .section { padding:96px 0; }
-    .container { max-width:1200px; margin:0 auto; padding:0 24px; }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .section-header { text-align:center; margin-bottom:56px; }
-    .section-header h2 { font-size:clamp(28px,4.2vw,48px); font-weight:300; letter-spacing:-0.02em; }
-    .section-header .kicker { margin-top:8px; color:#666; }
+        .logo {
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
 
-    .services-grid {
-      display:grid; gap:64px;
-      grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
-    }
-    .service-item { text-align:center; }
-    .service-visual { width:180px; height:180px; margin:0 auto 20px; }
-    .service-canvas { width:100%; height:100%; display:block; }
-    .service-title { font-size:22px; font-weight:400; letter-spacing:-0.01em; }
-    .service-description { color:#666; font-size:15px; max-width:360px; margin:10px auto 6px; }
-    .service-status { display:inline-block; padding:6px 12px; border:1px solid #ddd; border-radius:999px; font-size:12px; color:#555; }
-    .status-live { background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
 
-    /* Contact block – blended */
-    .contact { background:linear-gradient(180deg, #fff, #fafafa); }
-    .contact-card {
-      max-width:520px; margin:0 auto; background:#fff;
-      border:1px solid #eee; border-radius:12px; padding:36px 28px;
-    }
-    .form-group { margin-bottom:18px; text-align:left; }
-    label { display:block; font-size:14px; color:#222; margin-bottom:6px; }
-    input, textarea {
-      width:100%; font:inherit; color:#0a0a0a; background:#fff;
-      border:1px solid #ddd; border-radius:10px; padding:14px 12px;
-      transition:border-color .2s;
-    }
-    input:focus, textarea:focus { outline:none; border-color:#0a0a0a; }
-    .submit-btn {
-      width:100%; border:none; border-radius:10px; padding:14px 14px;
-      background:#0a0a0a; color:#fff; cursor:pointer; font-weight:500;
-    }
-    .submit-btn:hover { opacity:.9; }
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
 
-    /* Footer (no visual separation) */
-    footer { padding:64px 0 48px; text-align:center; color:#666; font-size:14px; }
+        .nav-links a:hover {
+            color: #0a0a0a;
+        }
 
-    @media (max-width: 768px){
-      .nav-menu { display:none; }
-      .service-visual { width:150px; height:150px; }
-    }
-  </style>
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #heroCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 0 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 4.5vw, 64px);
+            font-weight: 200;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .hero-sub {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 60px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 200;
+            display: block;
+            color: #1a73e8;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 100px 0;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-size: 48px;
+            font-weight: 200;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .service-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        }
+
+        .service-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .service-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .service-title {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .service-description {
+            color: #666;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .service-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .status-live {
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .status-beta {
+            background: #1a73e8;
+            color: #fff;
+        }
+
+        /* Protocol Section */
+        .protocol {
+            padding: 100px 0;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .protocol-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+
+        .protocol h2 {
+            font-size: 48px;
+            font-weight: 200;
+            margin-bottom: 24px;
+        }
+
+        .contract-address {
+            font-family: 'SF Mono', monospace;
+            background: rgba(255,255,255,0.1);
+            padding: 16px 24px;
+            border-radius: 8px;
+            margin: 32px 0;
+            word-break: break-all;
+            font-size: 14px;
+        }
+
+        footer {
+            padding: 60px 0;
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-stats {
+                flex-direction: column;
+                gap: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <nav>
-    <div class="nav-container">
-      <div class="logo">AtomicDot</div>
-      <div class="nav-menu">
-        <a href="#services">Services</a>
-        <a href="#contact">Contact</a>
-      </div>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <canvas id="heroCanvas"></canvas>
-    <div class="hero-content">
-      <h1>AtomicDot</h1>
-      <p class="sub">From atoms to outcomes.</p>
-    </div>
-  </section>
-
-  <section class="section" id="services">
-    <div class="container">
-      <div class="section-header">
-        <h2>Tiny systems. Real outcomes.</h2>
-        <div class="kicker">Fluid atoms that cohere into shape. Not flashy. Just physics.</div>
-      </div>
-
-      <div class="services-grid">
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="analysis"></canvas></div>
-          <div class="service-title">T&amp;C Decoded</div>
-          <div class="service-description">Legal terms atomised into risk and action.</div>
-          <div class="service-status status-live">Live</div>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">AtomicDot</div>
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#protocol">Protocol</a>
+                <a href="mailto:hello@atomicdot.com">Contact</a>
+            </div>
         </div>
+    </nav>
 
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="satellite"></canvas></div>
-          <div class="service-title">Satellite Intelligence</div>
-          <div class="service-description">Rare moments captured ahead of demand.</div>
-          <div class="service-status">Development</div>
+    <section class="hero">
+        <canvas id="heroCanvas"></canvas>
+        <div class="hero-content">
+            <h1>AtomicDot</h1>
+            <p class="hero-sub">Atoms for outcomes</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="impressions">0</span>
+                    <span class="stat-label">Verified Impressions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">5</span>
+                    <span class="stat-label">Live Services</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="users">0</span>
+                    <span class="stat-label">Active Users</span>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="network"></canvas></div>
-          <div class="service-title">Crisis Networks</div>
-          <div class="service-description">Fallback comms for grid-down scenarios.</div>
-          <div class="service-status">Acquisition</div>
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Live Services</h2>
+                <p>Deploy tiny solutions for massive outcomes</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card" onclick="window.location.href='/services/tc-decoded'">
+                    <div class="service-icon">
+                        <canvas class="service-canvas" data-type="tc"></canvas>
+                    </div>
+                    <h3 class="service-title">T&C Decoded</h3>
+                    <p class="service-description">
+                        AI-powered legal document analysis. Upload any terms, get instant risk scores and plain English summaries.
+                    </p>
+                    <span class="service-status status-live">Live</span>
+                </div>
+
+                <div class="service-card" onclick="window.location.href='/unified#o2co2'">
+                    <div class="service-icon">
+                        <canvas class="service-canvas" data-type="o2co2"></canvas>
+                    </div>
+                    <h3 class="service-title">O2CO2 Monitor</h3>
+                    <p class="service-description">
+                        Real-time environmental intelligence tracking global oxygen/carbon ratios and industrial polluters.
+                    </p>
+                    <span class="service-status status-beta">Beta</span>
+                </div>
+
+                <div class="service-card" onclick="window.open('https://polygonscan.com/address/0x9deb55540d1587b08ac4ddc40e3f285b453b9341', '_blank')">
+                    <div class="service-icon">
+                        <canvas class="service-canvas" data-type="adproof"></canvas>
+                    </div>
+                    <h3 class="service-title">Ad Proof Protocol</h3>
+                    <p class="service-description">
+                        Blockchain-verified advertising impressions. True campaign results through smart contracts.
+                    </p>
+                    <span class="service-status status-live">Live</span>
+                </div>
+
+                <div class="service-card" onclick="window.location.href='/services/scarcity'">
+                    <div class="service-icon">
+                        <canvas class="service-canvas" data-type="scarcity"></canvas>
+                    </div>
+                    <h3 class="service-title">Scarcity Intel</h3>
+                    <p class="service-description">
+                        Track resource depletion and industrial impact through interactive global dashboards.
+                    </p>
+                    <span class="service-status status-beta">Beta</span>
+                </div>
+
+                <div class="service-card" onclick="window.location.href='/services/inflation'">
+                    <div class="service-icon">
+                        <canvas class="service-canvas" data-type="inflation"></canvas>
+                    </div>
+                    <h3 class="service-title">Inflation Beater</h3>
+                    <p class="service-description">
+                        Live local inflation index and nearest cheaper options for the same products.
+                    </p>
+                    <span class="service-status status-live">Live</span>
+                </div>
+
+                <div class="service-card" onclick="alert('Event Tokens - Coming soon')">
+                    <div class="service-icon">
+                        <canvas class="service-canvas" data-type="events"></canvas>
+                    </div>
+                    <h3 class="service-title">Event Tokens</h3>
+                    <p class="service-description">
+                        Cultural moments as tradeable digital assets. Major events tokenized on blockchain.
+                    </p>
+                    <span class="service-status">Development</span>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="pattern"></canvas></div>
-          <div class="service-title">Pattern Intelligence</div>
-          <div class="service-description">Patent mining and supply chain signals.</div>
-          <div class="service-status">Research</div>
+    <section class="protocol" id="protocol">
+        <div class="protocol-content">
+            <h2>Ad Proof Protocol™</h2>
+            <p>The first decentralized standard for verified advertising impressions</p>
+            
+            <div class="contract-address">
+                Contract: 0x9deb55540d1587b08ac4ddc40e3f285b453b9341
+            </div>
+            
+            <div style="margin-top: 48px;">
+                <a href="https://polygonscan.com/address/0x9deb55540d1587b08ac4ddc40e3f285b453b9341" 
+                   target="_blank" 
+                   style="color: white; text-decoration: underline;">
+                    View on Polygonscan →
+                </a>
+            </div>
         </div>
+    </section>
 
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="token"></canvas></div>
-          <div class="service-title">Event Protocol</div>
-          <div class="service-description">Cultural moments as programmable assets.</div>
-          <div class="service-status">Protocol</div>
-        </div>
+    <footer>
+        <p>© 2025 AtomicDot. Access any atom of thought for personal impact.</p>
+    </footer>
 
-        <div class="service-item">
-          <div class="service-visual"><canvas class="service-canvas" data-service="water"></canvas></div>
-          <div class="service-title">O2CO2 Solutions</div>
-          <div class="service-description">Energy and water systems for transitions.</div>
-          <div class="service-status">Expanding</div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <script>
+        // Hero Canvas Animation - Circular Fluid Dots with Parallax
+        const canvas = document.getElementById('heroCanvas');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+        let frame = 0;
+        let scrollY = 0;
 
-  <section class="section contact" id="contact">
-    <div class="container">
-      <div class="section-header">
-        <h2>Need an outcome?</h2>
-        <div class="kicker">Book a working session. Leave with a plan.</div>
-      </div>
-      <div class="contact-card">
-        <form id="contactForm">
-          <div class="form-group">
-            <label>Organization</label>
-            <input type="text" name="organization" required />
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" required />
-          </div>
-          <div class="form-group">
-            <label>What outcome do you need?</label>
-            <textarea name="outcome" rows="4" placeholder="Intelligence, infrastructure, protocols, solutions..."></textarea>
-          </div>
-          <button class="submit-btn" type="submit">Begin</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="container">
-      © <span id="year"></span> AtomicDot
-    </div>
-  </footer>
-
-  <script>
-    // HERO: fluid atoms that periodically form a simple ring shape
-    (function(){
-      const canvas = document.getElementById('heroCanvas');
-      const ctx = canvas.getContext('2d');
-      const titleEl = document.querySelector('.hero-content h1');
-      let W, H, dots = [], gridGap = 22, t = 0, phase = 0;
-      let safeR = 140 * (window.devicePixelRatio||1);
-
-      function measureSafeRadius(){
-        try{
-          const r = titleEl.getBoundingClientRect();
-          const px = window.devicePixelRatio||1;
-          const margin = 60;
-          safeR = (Math.max(r.width, r.height)/2 + margin) * px;
-        }catch(_){}}
-
-      function resize(){
-        W = canvas.width  = window.innerWidth * devicePixelRatio;
-        H = canvas.height = window.innerHeight * devicePixelRatio;
-        canvas.style.width  = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        measureSafeRadius();
-        initDots();
-      }
-      window.addEventListener('resize', resize);
-
-      function initDots(){
-        dots = [];
-        const cols = Math.floor((W/devicePixelRatio) / gridGap);
-        const rows = Math.floor((H/devicePixelRatio) / gridGap);
-        for(let x=0;x<cols;x++){
-          for(let y=0;y<rows;y++){
-            const px = (x*gridGap + gridGap/2) * devicePixelRatio;
-            const py = (y*gridGap + gridGap/2) * devicePixelRatio;
-            dots.push({ ox:px, oy:py, x:px, y:py, s:0.8+Math.random()*1.6, a:0.15+Math.random()*0.35, p:Math.random()*Math.PI*2, tx:px, ty:py });
-          }
-        }
-        setTargets('grid');
-      }
-
-      function setTargets(mode){
-        const cx = W/2, cy = H/2;
-        if(mode === 'grid'){
-          dots.forEach(d => { d.tx = d.ox; d.ty = d.oy; });
-        } else if(mode === 'ring'){
-          const radius = Math.max(safeR + 100*(devicePixelRatio||1), Math.min(W,H)*0.22);
-          const ringCount = Math.min(dots.length, Math.floor(2*Math.PI*radius / (gridGap*devicePixelRatio*0.9)));
-          for(let i=0;i<dots.length;i++){
-            const j = i % ringCount;
-            const ang = (j / ringCount) * Math.PI*2;
-            const r  = radius + Math.sin(i*0.7)*4;
-            dots[i].tx = cx + Math.cos(ang)*r;
-            dots[i].ty = cy + Math.sin(ang)*r;
-          }
-        }
-      }
-
-      function animate(){
-        t += 0.008;
-        const cycle = (Math.sin(t) + 1)/2;
-        const morph = smoothstep(0.25, 0.75, cycle);
-        const toRing = morph;
-
-        const cx = W/2, cy = H/2;
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle = '#0a0a0a';
-
-        for(let i=0;i<dots.length;i++){
-          const d = dots[i];
-          const gx = d.ox, gy = d.oy;
-          const rx = d.tx, ry = d.ty;
-
-          const wobX = Math.sin(t*2 + d.p + i*0.037) * 4 * devicePixelRatio;
-          const wobY = Math.cos(t*1.6 + d.p + i*0.023) * 3 * devicePixelRatio;
-
-          const bx = lerp(gx, rx, toRing) + wobX;
-          const by = lerp(gy, ry, toRing) + wobY;
-
-          d.x += (bx - d.x) * 0.06;
-          d.y += (by - d.y) * 0.06;
-
-          const dx = d.x - cx, dy = d.y - cy;
-          if (dx*dx + dy*dy < (safeR*safeR)) continue;
-
-          const size = (d.s + Math.sin(t*3 + i*0.12)*0.6) * devicePixelRatio;
-          const alpha = clamp(d.a + Math.sin(t + i*0.05)*0.18, 0.05, 0.9);
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, size, 0, Math.PI*2);
-          ctx.fill();
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initDots();
         }
 
-        if(cycle < 0.05 && phase !== 0){ phase = 0; setTargets('grid'); }
-        if(cycle > 0.95 && phase !== 1){ phase = 1; setTargets('ring'); }
-
-        requestAnimationFrame(animate);
-      }
-
-      function lerp(a,b,t){ return a + (b-a)*t; }
-      function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-      function smoothstep(edge0, edge1, x){
-        const t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-        return t * t * (3 - 2 * t);
-      }
-
-      resize();
-      setTargets('ring');
-      phase = 1;
-      requestAnimationFrame(animate);
-    })();
-
-    // Mini canvases for services
-    (function(){
-      const canvases = document.querySelectorAll('.service-canvas');
-      const observers = [];
-
-      canvases.forEach((c)=>{
-        const ctx = c.getContext('2d');
-        const size = 180;
-        c.width = size * devicePixelRatio;
-        c.height = size * devicePixelRatio;
-        c.style.width = size+'px';
-        c.style.height = size+'px';
-
-        let t = 0, vis = false;
-        const obs = new IntersectionObserver((es)=>{
-          es.forEach(e=> vis = e.isIntersecting);
-        });
-        obs.observe(c);
-        observers.push(obs);
-
-        function draw(){
-          if(!vis){ requestAnimationFrame(draw); return; }
-          t += 0.02;
-          const W = c.width, H = c.height;
-          const ctx2 = ctx;
-          ctx2.clearRect(0,0,W,H);
-          ctx2.fillStyle = '#0a0a0a';
-          const cx = W/2, cy = H/2;
-
-          // Generic orbiting dots
-          for(let ring=0; ring<3; ring++){
-            const r = (32 + ring*22) * devicePixelRatio;
-            const points = 8 + ring*4;
-            for(let i=0;i<points;i++){
-              const a = i/points * Math.PI*2 + t*(0.8 + ring*0.2);
-              const x = cx + Math.cos(a)*r + Math.sin(t*1.7 + i)*3*devicePixelRatio;
-              const y = cy + Math.sin(a)*r + Math.cos(t*1.3 + i)*2*devicePixelRatio;
-              const s = (3 - ring*0.6) * devicePixelRatio;
-              ctx2.globalAlpha = 0.6 + Math.sin(t+i)*0.3;
-              ctx2.beginPath();
-              ctx2.arc(x,y,s,0,Math.PI*2);
-              ctx2.fill();
+        function initDots() {
+            dots = [];
+            const numDots = 150;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            for (let i = 0; i < numDots; i++) {
+                const angle = (i / numDots) * Math.PI * 2;
+                const radius = 100 + Math.random() * 150;
+                dots.push({
+                    x: centerX + Math.cos(angle) * radius,
+                    y: centerY + Math.sin(angle) * radius,
+                    size: Math.random() * 2 + 1,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: Math.random() * 0.02 + 0.01,
+                    radius: radius,
+                    angle: angle
+                });
             }
-          }
-          // Core
-          ctx2.globalAlpha = 1;
-          ctx2.beginPath();
-          ctx2.arc(cx, cy, 6*devicePixelRatio, 0, Math.PI*2);
-          ctx2.fill();
-
-          requestAnimationFrame(draw);
         }
-        draw();
-      });
-    })();
 
-    // Form
-    document.getElementById('contactForm').addEventListener('submit', function(e){
-      e.preventDefault();
-      const data = new FormData(e.target);
-      const subject = encodeURIComponent('AtomicDot – Inquiry from ' + (data.get('organization')||'Unknown'));
-      const body = encodeURIComponent(
-        `Organization: ${data.get('organization')}
-Email: ${data.get('email')}
+        function animateHero() {
+            frame += 0.01;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 - scrollY * 0.5;
+            
+            dots.forEach((dot, i) => {
+                const angle = dot.angle + frame * dot.speed;
+                const radius = dot.radius + Math.sin(frame * 2 + dot.phase) * 30;
+                
+                dot.x = centerX + Math.cos(angle) * radius;
+                dot.y = centerY + Math.sin(angle) * radius - scrollY * 0.3;
+                
+                const alpha = 0.3 + Math.sin(frame + i * 0.1) * 0.2;
+                ctx.fillStyle = `rgba(10, 10, 10, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            requestAnimationFrame(animateHero);
+        }
 
-Desired Outcome:
-${data.get('outcome')||''}`
-      );
-      location.href = `mailto:hello@atomicdot.com?subject=${subject}&body=${body}`;
-    });
+        window.addEventListener('scroll', () => {
+            scrollY = window.scrollY;
+        });
 
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animateHero();
+
+        // Service Icon Animations
+        document.querySelectorAll('.service-canvas').forEach(canvas => {
+            const ctx = canvas.getContext('2d');
+            const type = canvas.dataset.type;
+            canvas.width = 240;
+            canvas.height = 240;
+            
+            let animFrame = 0;
+            
+            function drawServiceIcon() {
+                animFrame += 0.02;
+                ctx.clearRect(0, 0, 240, 240);
+                
+                const cx = 120;
+                const cy = 120;
+                
+                if (type === 'tc') {
+                    for (let i = 0; i < 5; i++) {
+                        for (let j = 0; j < 7; j++) {
+                            const x = 60 + i * 25;
+                            const y = 40 + j * 25;
+                            const size = 2 + Math.sin(animFrame + i + j) * 1;
+                            ctx.fillStyle = `rgba(10, 10, 10, ${0.6 + Math.sin(animFrame + i * j) * 0.3})`;
+                            ctx.beginPath();
+                            ctx.arc(x, y, size, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                } else if (type === 'o2co2') {
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i / 12) * Math.PI * 2 + animFrame;
+                        const radius = 60 + Math.sin(animFrame * 2) * 10;
+                        const x = cx + Math.cos(angle) * radius;
+                        const y = cy + Math.sin(angle) * radius;
+                        const size = 4 + Math.sin(animFrame + i) * 2;
+                        ctx.fillStyle = i < 6 ? `rgba(26, 115, 232, 0.7)` : `rgba(244, 67, 54, 0.7)`;
+                        ctx.beginPath();
+                        ctx.arc(x, y, size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (type === 'adproof') {
+                    const points = 8;
+                    for (let ring = 0; ring < 3; ring++) {
+                        const radius = 30 + ring * 30;
+                        for (let i = 0; i < points; i++) {
+                            const angle = (i / points) * Math.PI * 2 + animFrame * (1 - ring * 0.2);
+                            const x = cx + Math.cos(angle) * radius;
+                            const y = cy + Math.sin(angle) * radius;
+                            const size = 4 - ring;
+                            ctx.fillStyle = `rgba(10, 10, 10, ${0.8 - ring * 0.2})`;
+                            ctx.beginPath();
+                            ctx.arc(x, y, size, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < 20; i++) {
+                        const angle = (i / 20) * Math.PI * 2;
+                        const radius = 50 + Math.sin(animFrame + i * 0.5) * 20;
+                        const x = cx + Math.cos(angle) * radius;
+                        const y = cy + Math.sin(angle) * radius;
+                        ctx.fillStyle = `rgba(10, 10, 10, 0.5)`;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                requestAnimationFrame(drawServiceIcon);
+            }
+            
+            drawServiceIcon();
+        });
+
+        // Animate stats
+        function animateNumber(elementId, target, duration = 2000) {
+            const element = document.getElementById(elementId);
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString();
+            }, 16);
+        }
+
+        setTimeout(() => {
+            animateNumber('impressions', 12847);
+            animateNumber('users', 423);
+        }, 1000);
+    </script>
 </body>
 </html>
