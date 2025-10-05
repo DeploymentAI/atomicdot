@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXIS: Complete Civilization Simulator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #app {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .ui-overlay > * {
+            pointer-events: auto;
+        }
+        
+        /* Header */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .world-tabs {
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .world-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .world-tab:hover {
+            color: #fff;
+        }
+        
+        .world-tab.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        
+        .world-tab.vedic.active { box-shadow: 0 2px 0 #f59e0b; }
+        .world-tab.gnostic.active { box-shadow: 0 2px 0 #8b5cf6; }
+        .world-tab.hybrid.active { box-shadow: 0 2px 0 #10b981; }
+        .world-tab.tech.active { box-shadow: 0 2px 0 #3b82f6; }
+        
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        /* Left Panel */
+        .left-panel {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            width: 280px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .settlement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .settlement-item {
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .settlement-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        
+        .settlement-name {
+            font-weight: 500;
+        }
+        
+        .settlement-pop {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .innovations {
+            margin-top: 20px;
+        }
+        
+        .innovation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .innovation {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .innovation:hover {
+            background: rgba(255,255,255,0.1);
+            transform: scale(1.1);
+        }
+        
+        .innovation.unlocked {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        
+        .innovation-name {
+            font-size: 8px;
+            margin-top: 4px;
+            text-align: center;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 320px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .metric-card {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .metric-change {
+            font-size: 11px;
+            color: #4ade80;
+            margin-top: 5px;
+        }
+        
+        .metric-change.negative {
+            color: #f87171;
+        }
+        
+        /* Event Log */
+        .event-log {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 320px;
+            max-height: 200px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+        
+        .event {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            border-left: 3px solid;
+            font-size: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .event.vedic { border-left-color: #f59e0b; }
+        .event.gnostic { border-left-color: #8b5cf6; }
+        .event.hybrid { border-left-color: #10b981; }
+        .event.tech { border-left-color: #3b82f6; }
+        
+        .event-year {
+            font-weight: 600;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .year-display {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .era-label {
+            font-size: 12px;
+            color: #666;
+            margin-left: 10px;
+        }
+        
+        .timeline-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+        
+        .timeline-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .timeline-markers {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 10px;
+            color: #666;
+        }
+        
+        /* View Controls */
+        .view-controls {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .view-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .view-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .view-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+        }
+        
+        /* Mini Map */
+        .mini-map {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        #miniMapCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+        
+        /* Graphs Panel */
+        .graphs-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 70%;
+            background: rgba(0,0,0,0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .graphs-panel.active {
+            display: grid;
+        }
+        
+        .graph {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .graph-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #999;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Comparison View */
+        .comparison-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 80%;
+            background: rgba(0,0,0,0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .comparison-panel.active {
+            display: grid;
+        }
+        
+        .world-column {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .world-column h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .comparison-stat {
+            margin-bottom: 15px;
+        }
+        
+        .comparison-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .comparison-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .comparison-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+        }
+        
+        .comparison-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="loader"></div>
+        <p style="margin-top: 20px; color: #666;">Initializing AXIS Simulator...</p>
+    </div>
+    
+    <div id="app">
+        <div id="canvas-container"></div>
+        
+        <div class="ui-overlay">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo">AXIS</div>
+                
+                <div class="world-tabs">
+                    <button class="world-tab vedic active" data-world="vedic">Vedic</button>
+                    <button class="world-tab gnostic" data-world="gnostic">Gnostic</button>
+                    <button class="world-tab hybrid" data-world="hybrid">Hybrid</button>
+                    <button class="world-tab tech" data-world="tech">Tech-First</button>
+                </div>
+                
+                <div class="header-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="yearHeader">0</div>
+                        <div class="stat-label">Year</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="popHeader">100</div>
+                        <div class="stat-label">Population</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="settlementsHeader">1</div>
+                        <div class="stat-label">Settlements</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- View Controls -->
+            <div class="view-controls">
+                <button class="view-btn active" data-view="world">World View</button>
+                <button class="view-btn" data-view="settlement">Settlement View</button>
+                <button class="view-btn" data-view="graphs">Analytics</button>
+                <button class="view-btn" data-view="comparison">Compare Worlds</button>
+            </div>
+            
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <h3 class="panel-title">Settlements</h3>
+                <div class="settlement-list" id="settlementList"></div>
+                
+                <div class="innovations">
+                    <h3 class="panel-title">Innovations</h3>
+                    <div class="innovation-grid" id="innovationGrid"></div>
+                </div>
+            </div>
+            
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <h3 class="panel-title">Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="populationMetric">100</div>
+                        <div class="metric-label">Population</div>
+                        <div class="metric-change">+2.3%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="resourcesMetric">500</div>
+                        <div class="metric-label">Resources</div>
+                        <div class="metric-change">+5.1%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="techMetric">1.0</div>
+                        <div class="metric-label">Tech Level</div>
+                        <div class="metric-change">+0.1</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="happinessMetric">75%</div>
+                        <div class="metric-label">Happiness</div>
+                        <div class="metric-change negative">-2.0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Event Log -->
+            <div class="event-log" id="eventLog">
+                <h3 class="panel-title">Events</h3>
+            </div>
+            
+            <!-- Timeline -->
+            <div class="timeline">
+                <div class="timeline-header">
+                    <div>
+                        <span class="year-display" id="yearDisplay">Year 0</span>
+                        <span class="era-label" id="eraLabel">Stone Age</span>
+                    </div>
+                    <div class="timeline-controls">
+                        <button class="control-btn" id="playBtn">▶</button>
+                        <button class="control-btn" id="pauseBtn">⏸</button>
+                        <button class="control-btn" id="speedBtn">2x</button>
+                        <button class="control-btn" id="resetBtn">↺</button>
+                    </div>
+                </div>
+                <div class="timeline-bar" id="timelineBar">
+                    <div class="timeline-progress" id="timelineProgress" style="width: 0%"></div>
+                </div>
+                <div class="timeline-markers">
+                    <span>0</span>
+                    <span>2500</span>
+                    <span>5000</span>
+                    <span>7500</span>
+                    <span>10000</span>
+                </div>
+            </div>
+            
+            <!-- Mini Map -->
+            <div class="mini-map">
+                <canvas id="miniMapCanvas"></canvas>
+            </div>
+            
+            <!-- Graphs Panel (Hidden by default) -->
+            <div class="graphs-panel" id="graphsPanel">
+                <button class="close-btn" onclick="closeGraphs()">✕</button>
+                <div class="graph">
+                    <h3 class="graph-title">Population Growth</h3>
+                    <canvas id="popGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <h3 class="graph-title">Resource Production</h3>
+                    <canvas id="resourceGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <h3 class="graph-title">Innovation Timeline</h3>
+                    <canvas id="innovationGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <h3 class="graph-title">Conflict & Cooperation</h3>
+                    <canvas id="conflictGraph"></canvas>
+                </div>
+            </div>
+            
+            <!-- Comparison Panel (Hidden by default) -->
+            <div class="comparison-panel" id="comparisonPanel">
+                <button class="close-btn" onclick="closeComparison()">✕</button>
+                <!-- Will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ==========================================
+        // COMPLETE CIVILIZATION SIMULATION ENGINE
+        // ==========================================
+        
+        class CivilizationSimulator {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.terrain = null;
+                this.settlements = [];
+                this.agents = [];
+                this.resources = [];
+                this.year = 0;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.currentWorld = 'vedic';
+                this.currentView = 'world';
+                
+                // World configurations
+                this.worldConfigs = {
+                    vedic: {
+                        name: 'Vedic',
+                        color: 0xf59e0b,
+                        ritualEfficacy: 0.8,
+                        techMultiplier: 0.6,
+                        socialCohesion: 0.9,
+                        startingPop: 100,
+                        innovations: []
+                    },
+                    gnostic: {
+                        name: 'Gnostic',
+                        color: 0x8b5cf6,
+                        revelationRate: 0.05,
+                        hiddenKnowledge: 0.7,
+                        techMultiplier: 0.8,
+                        startingPop: 80,
+                        innovations: []
+                    },
+                    hybrid: {
+                        name: 'Hybrid',
+                        color: 0x10b981,
+                        adaptability: 0.85,
+                        syncretism: 0.8,
+                        techMultiplier: 1.0,
+                        startingPop: 120,
+                        innovations: []
+                    },
+                    tech: {
+                        name: 'Tech-First',
+                        color: 0x3b82f6,
+                        aiIntegration: 0.9,
+                        techMultiplier: 3.0,
+                        automationLevel: 0.8,
+                        startingPop: 150,
+                        innovations: ['AGI', 'Biotech', 'Quantum Computing']
+                    }
+                };
+                
+                // Simulation data
+                this.simulationData = {
+                    population: [],
+                    resources: [],
+                    innovations: [],
+                    conflicts: [],
+                    events: []
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupThreeJS();
+                this.createTerrain();
+                this.initializeWorld();
+                this.setupControls();
+                this.setupUI();
+                this.animate();
+                
+                // Hide loading screen
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                }, 1000);
+            }
+            
+            setupThreeJS() {
+                const container = document.getElementById('canvas-container');
+                
+                // Scene
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.Fog(0x000000, 50, 500);
+                
+                // Camera
+                this.camera = new THREE.PerspectiveCamera(
+                    60,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+                this.camera.position.set(50, 80, 100);
+                this.camera.lookAt(0, 0, 0);
+                
+                // Renderer
+                this.renderer = new THREE.WebGLRenderer({ 
+                    antialias: true,
+                    alpha: true 
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                container.appendChild(this.renderer.domElement);
+                
+                // Lights
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+                this.scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(50, 100, 50);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.camera.near = 0.1;
+                directionalLight.shadow.camera.far = 500;
+                directionalLight.shadow.camera.left = -100;
+                directionalLight.shadow.camera.right = 100;
+                directionalLight.shadow.camera.top = 100;
+                directionalLight.shadow.camera.bottom = -100;
+                this.scene.add(directionalLight);
+                
+                // Add hemisphere light for better ambiance
+                const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x8B7355, 0.3);
+                this.scene.add(hemisphereLight);
+            }
+            
+            createTerrain() {
+                // Create terrain mesh
+                const terrainGeometry = new THREE.PlaneGeometry(200, 200, 50, 50);
+                const vertices = terrainGeometry.attributes.position.array;
+                
+                // Generate realistic terrain heights
+                for (let i = 0; i < vertices.length; i += 3) {
+                    const x = vertices[i];
+                    const y = vertices[i + 1];
+                    
+                    // Create varied terrain with mountains, valleys, and plains
+                    let height = 0;
+                    
+                    // Mountains
+                    height += Math.sin(x * 0.05) * Math.cos(y * 0.05) * 10;
+                    
+                    // Rolling hills
+                    height += Math.sin(x * 0.1) * Math.sin(y * 0.1) * 5;
+                    
+                    // Small variations
+                    height += (Math.random() - 0.5) * 2;
+                    
+                    vertices[i + 2] = height;
+                }
+                
+                terrainGeometry.computeVertexNormals();
+                
+                // Create terrain material with vertex colors
+                const terrainMaterial = new THREE.MeshLambertMaterial({
+                    vertexColors: true,
+                    side: THREE.DoubleSide
+                });
+                
+                // Add colors based on height
+                const colors = [];
+                for (let i = 0; i < vertices.length; i += 3) {
+                    const height = vertices[i + 2];
+                    let r, g, b;
+                    
+                    if (height < -2) {
+                        // Water - blue
+                        r = 0; g = 0.4; b = 0.6;
+                    } else if (height < 2) {
+                        // Grassland - green
+                        r = 0.2; g = 0.5; b = 0.1;
+                    } else if (height < 5) {
+                        // Hills - brown
+                        r = 0.5; g = 0.4; b = 0.3;
+                    } else {
+                        // Mountains - gray
+                        r = 0.4; g = 0.4; b = 0.4;
+                    }
+                    
+                    colors.push(r, g, b);
+                }
+                
+                terrainGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                
+                this.terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
+                this.terrain.rotation.x = -Math.PI / 2;
+                this.terrain.receiveShadow = true;
+                this.scene.add(this.terrain);
+                
+                // Add water plane
+                const waterGeometry = new THREE.PlaneGeometry(200, 200);
+                const waterMaterial = new THREE.MeshPhongMaterial({
+                    color: 0x006994,
+                    transparent: true,
+                    opacity: 0.6,
+                    shininess: 100
+                });
+                const water = new THREE.Mesh(waterGeometry, waterMaterial);
+                water.rotation.x = -Math.PI / 2;
+                water.position.y = -2;
+                this.scene.add(water);
+                
+                // Add trees
+                this.addVegetation();
+            }
+            
+            addVegetation() {
+                const treeGeometry = new THREE.ConeGeometry(2, 8, 6);
+                const treeMaterial = new THREE.MeshLambertMaterial({ color: 0x0d5a0d });
+                
+                for (let i = 0; i < 100; i++) {
+                    const tree = new THREE.Mesh(treeGeometry, treeMaterial);
+                    const x = (Math.random() - 0.5) * 180;
+                    const z = (Math.random() - 0.5) * 180;
+                    const y = this.getTerrainHeight(x, z);
+                    
+                    if (y > 0 && y < 5) { // Only place trees on land, not mountains
+                        tree.position.set(x, y + 4, z);
+                        tree.castShadow = true;
+                        tree.receiveShadow = true;
+                        this.scene.add(tree);
+                    }
+                }
+            }
+            
+            getTerrainHeight(x, z) {
+                // Sample terrain height at position
+                return Math.sin(x * 0.05) * Math.cos(z * 0.05) * 10 +
+                       Math.sin(x * 0.1) * Math.sin(z * 0.1) * 5;
+            }
+            
+            initializeWorld() {
+                const config = this.worldConfigs[this.currentWorld];
+                
+                // Create initial settlement
+                this.createSettlement(0, 0, 'capital');
+                
+                // Create initial agents
+                for (let i = 0; i < config.startingPop; i++) {
+                    this.createAgent(
+                        (Math.random() - 0.5) * 20,
+                        (Math.random() - 0.5) * 20
+                    );
+                }
+                
+                // Add initial resources
+                this.scatterResources();
+                
+                // Initialize innovations for tech world
+                if (this.currentWorld === 'tech') {
+                    config.innovations.forEach(innovation => {
+                        this.unlockInnovation(innovation);
+                    });
+                }
+            }
+            
+            createSettlement(x, z, type = 'village') {
+                const config = this.worldConfigs[this.currentWorld];
+                const group = new THREE.Group();
+                
+                // Settlement platform
+                const platformGeometry = new THREE.CylinderGeometry(
+                    type === 'capital' ? 8 : 5,
+                    type === 'capital' ? 10 : 6,
+                    1,
+                    8
+                );
+                const platformMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0x8B7355 
+                });
+                const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+                platform.castShadow = true;
+                platform.receiveShadow = true;
+                group.add(platform);
+                
+                // Main building based on civilization
+                if (this.currentWorld === 'vedic') {
+                    // Temple
+                    const templeGeometry = new THREE.ConeGeometry(3, 8, 4);
+                    const templeMaterial = new THREE.MeshPhongMaterial({
+                        color: config.color,
+                        emissive: config.color,
+                        emissiveIntensity: 0.2
+                    });
+                    const temple = new THREE.Mesh(templeGeometry, templeMaterial);
+                    temple.position.y = 5;
+                    temple.castShadow = true;
+                    group.add(temple);
+                    
+                    // Sacred fire
+                    const fireLight = new THREE.PointLight(0xff6600, 1, 20);
+                    fireLight.position.y = 2;
+                    group.add(fireLight);
+                    
+                } else if (this.currentWorld === 'gnostic') {
+                    // Pyramid
+                    const pyramidGeometry = new THREE.ConeGeometry(4, 6, 4);
+                    const pyramidMaterial = new THREE.MeshPhongMaterial({
+                        color: config.color,
+                        emissive: config.color,
+                        emissiveIntensity: 0.2
+                    });
+                    const pyramid = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
+                    pyramid.position.y = 4;
+                    pyramid.rotation.y = Math.PI / 4;
+                    pyramid.castShadow = true;
+                    group.add(pyramid);
+                    
+                } else if (this.currentWorld === 'tech') {
+                    // Modern building
+                    const buildingGeometry = new THREE.BoxGeometry(3, 12, 3);
+                    const buildingMaterial = new THREE.MeshPhongMaterial({
+                        color: config.color,
+                        emissive: config.color,
+                        emissiveIntensity: 0.3,
+                        metalness: 0.8,
+                        roughness: 0.2
+                    });
+                    const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+                    building.position.y = 6;
+                    building.castShadow = true;
+                    group.add(building);
+                    
+                    // Tech glow
+                    const techLight = new THREE.PointLight(0x00ffff, 2, 30);
+                    techLight.position.y = 10;
+                    group.add(techLight);
+                }
+                
+                // Add houses
+                const houseGeometry = new THREE.BoxGeometry(2, 2, 2);
+                const houseMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0x654321 
+                });
+                
+                const numHouses = type === 'capital' ? 12 : 6;
+                for (let i = 0; i < numHouses; i++) {
+                    const house = new THREE.Mesh(houseGeometry, houseMaterial);
+                    const angle = (i / numHouses) * Math.PI * 2;
+                    const radius = type === 'capital' ? 12 : 8;
+                    house.position.x = Math.cos(angle) * radius;
+                    house.position.z = Math.sin(angle) * radius;
+                    house.position.y = 1;
+                    house.castShadow = true;
+                    group.add(house);
+                }
+                
+                // Position settlement
+                const y = this.getTerrainHeight(x, z);
+                group.position.set(x, y, z);
+                
+                // Add to scene and track
+                this.scene.add(group);
+                this.settlements.push({
+                    mesh: group,
+                    type: type,
+                    population: type === 'capital' ? 50 : 20,
+                    x: x,
+                    z: z,
+                    name: this.generateSettlementName()
+                });
+                
+                this.updateSettlementList();
+            }
+            
+            generateSettlementName() {
+                const prefixes = {
+                    vedic: ['Indra', 'Agni', 'Soma', 'Varuna'],
+                    gnostic: ['Sophia', 'Gnosis', 'Pleroma', 'Aeon'],
+                    hybrid: ['Unity', 'Harmony', 'Balance', 'Synthesis'],
+                    tech: ['Neo', 'Cyber', 'Quantum', 'Digital']
+                };
+                
+                const suffixes = ['pura', 'grad', 'ville', 'heim', 'ton', 'burg'];
+                const prefix = prefixes[this.currentWorld][Math.floor(Math.random() * 4)];
+                const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+                return prefix + suffix;
+            }
+            
+            createAgent(x, z) {
+                const config = this.worldConfigs[this.currentWorld];
+                const agentGeometry = new THREE.SphereGeometry(0.5, 8, 8);
+                const agentMaterial = new THREE.MeshPhongMaterial({
+                    color: config.color,
+                    emissive: config.color,
+                    emissiveIntensity: 0.3
+                });
+                
+                const agent = new THREE.Mesh(agentGeometry, agentMaterial);
+                const y = this.getTerrainHeight(x, z);
+                agent.position.set(x, y + 0.5, z);
+                agent.castShadow = true;
+                
+                // Agent data
+                agent.userData = {
+                    health: 100,
+                    age: Math.floor(Math.random() * 50) + 15,
+                    role: this.assignRole(),
+                    destination: null,
+                    speed: 0.1 + Math.random() * 0.1
+                };
+                
+                this.scene.add(agent);
+                this.agents.push(agent);
+            }
+            
+            assignRole() {
+                const roles = ['farmer', 'warrior', 'priest', 'merchant', 'scholar'];
+                if (this.currentWorld === 'tech') {
+                    roles.push('engineer', 'scientist', 'ai_specialist');
+                }
+                return roles[Math.floor(Math.random() * roles.length)];
+            }
+            
+            scatterResources() {
+                const resourceTypes = [
+                    { name: 'food', color: 0x90EE90, icon: '🌾' },
+                    { name: 'stone', color: 0x808080, icon: '⛏️' },
+                    { name: 'wood', color: 0x8B4513, icon: '🪵' },
+                    { name: 'gold', color: 0xFFD700, icon: '✨' }
+                ];
+                
+                resourceTypes.forEach(type => {
+                    for (let i = 0; i < 10; i++) {
+                        const x = (Math.random() - 0.5) * 150;
+                        const z = (Math.random() - 0.5) * 150;
+                        const y = this.getTerrainHeight(x, z);
+                        
+                        if (y > 0) { // Only on land
+                            const geometry = new THREE.BoxGeometry(1, 1, 1);
+                            const material = new THREE.MeshLambertMaterial({ 
+                                color: type.color 
+                            });
+                            const resource = new THREE.Mesh(geometry, material);
+                            resource.position.set(x, y + 0.5, z);
+                            resource.userData = { type: type.name, amount: 100 };
+                            this.scene.add(resource);
+                            this.resources.push(resource);
+                        }
+                    }
+                });
+            }
+            
+            setupControls() {
+                // Mouse controls
+                let mouseX = 0, mouseY = 0;
+                let isMouseDown = false;
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (isMouseDown) {
+                        const deltaX = e.clientX - mouseX;
+                        const deltaY = e.clientY - mouseY;
+                        
+                        // Rotate camera around center
+                        const spherical = new THREE.Spherical();
+                        spherical.setFromVector3(this.camera.position);
+                        spherical.theta -= deltaX * 0.01;
+                        spherical.phi += deltaY * 0.01;
+                        spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+                        this.camera.position.setFromSpherical(spherical);
+                        this.camera.lookAt(0, 0, 0);
+                    }
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+                
+                document.addEventListener('mousedown', () => { isMouseDown = true; });
+                document.addEventListener('mouseup', () => { isMouseDown = false; });
+                
+                // Scroll for zoom
+                document.addEventListener('wheel', (e) => {
+                    const scale = e.deltaY > 0 ? 1.1 : 0.9;
+                    this.camera.position.multiplyScalar(scale);
+                });
+                
+                // Window resize
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+            
+            setupUI() {
+                // World tabs
+                document.querySelectorAll('.world-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        this.switchWorld(tab.dataset.world);
+                        document.querySelectorAll('.world-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                    });
+                });
+                
+                // View buttons
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.switchView(btn.dataset.view);
+                        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    });
+                });
+                
+                // Timeline controls
+                document.getElementById('playBtn').addEventListener('click', () => {
+                    this.isPlaying = true;
+                });
+                
+                document.getElementById('pauseBtn').addEventListener('click', () => {
+                    this.isPlaying = false;
+                });
+                
+                document.getElementById('speedBtn').addEventListener('click', () => {
+                    this.speed = this.speed === 1 ? 2 : (this.speed === 2 ? 5 : 1);
+                    document.getElementById('speedBtn').textContent = this.speed + 'x';
+                });
+                
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    this.reset();
+                });
+                
+                // Timeline bar click
+                document.getElementById('timelineBar').addEventListener('click', (e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const percent = (e.clientX - rect.left) / rect.width;
+                    this.year = Math.floor(percent * 10000);
+                    this.updateUI();
+                });
+                
+                // Initialize mini map
+                this.initMiniMap();
+            }
+            
+            initMiniMap() {
+                const canvas = document.getElementById('miniMapCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 180;
+                canvas.height = 180;
+                
+                // Draw terrain overview
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, 180, 180);
+                
+                // Update mini map periodically
+                setInterval(() => this.updateMiniMap(ctx), 1000);
+            }
+            
+            updateMiniMap(ctx) {
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, 180, 180);
+                
+                // Draw settlements
+                this.settlements.forEach(settlement => {
+                    const x = (settlement.x + 100) * 0.9;
+                    const z = (settlement.z + 100) * 0.9;
+                    const config = this.worldConfigs[this.currentWorld];
+                    
+                    ctx.fillStyle = `#${config.color.toString(16).padStart(6, '0')}`;
+                    ctx.beginPath();
+                    ctx.arc(x, z, settlement.type === 'capital' ? 5 : 3, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                // Draw camera position
+                ctx.strokeStyle = '#fff';
+                ctx.strokeRect(80, 80, 20, 20);
+            }
+            
+            switchWorld(worldName) {
+                this.currentWorld = worldName;
+                
+                // Clear existing world
+                this.settlements.forEach(s => this.scene.remove(s.mesh));
+                this.agents.forEach(a => this.scene.remove(a));
+                this.resources.forEach(r => this.scene.remove(r));
+                
+                this.settlements = [];
+                this.agents = [];
+                this.resources = [];
+                
+                // Initialize new world
+                this.initializeWorld();
+                this.updateUI();
+            }
+            
+            switchView(viewName) {
+                this.currentView = viewName;
+                
+                if (viewName === 'graphs') {
+                    document.getElementById('graphsPanel').classList.add('active');
+                    this.updateGraphs();
+                } else if (viewName === 'comparison') {
+                    document.getElementById('comparisonPanel').classList.add('active');
+                    this.updateComparison();
+                } else {
+                    document.getElementById('graphsPanel').classList.remove('active');
+                    document.getElementById('comparisonPanel').classList.remove('active');
+                    
+                    if (viewName === 'settlement' && this.settlements.length > 0) {
+                        // Focus on first settlement
+                        const settlement = this.settlements[0];
+                        this.camera.position.set(
+                            settlement.x + 20,
+                            30,
+                            settlement.z + 20
+                        );
+                        this.camera.lookAt(settlement.x, 0, settlement.z);
+                    } else {
+                        // World view
+                        this.camera.position.set(50, 80, 100);
+                        this.camera.lookAt(0, 0, 0);
+                    }
+                }
+            }
+            
+            simulate() {
+                if (!this.isPlaying) return;
+                
+                this.year += this.speed;
+                
+                // Simulate agent movement
+                this.agents.forEach(agent => {
+                    if (!agent.userData.destination || Math.random() < 0.01) {
+                        // Set new random destination
+                        agent.userData.destination = new THREE.Vector3(
+                            (Math.random() - 0.5) * 100,
+                            0,
+                            (Math.random() - 0.5) * 100
+                        );
+                    }
+                    
+                    // Move towards destination
+                    const direction = new THREE.Vector3();
+                    direction.subVectors(agent.userData.destination, agent.position);
+                    direction.normalize();
+                    direction.multiplyScalar(agent.userData.speed);
+                    
+                    agent.position.x += direction.x;
+                    agent.position.z += direction.z;
+                    agent.position.y = this.getTerrainHeight(agent.position.x, agent.position.z) + 0.5;
+                });
+                
+                // Population growth
+                if (this.year % 100 === 0) {
+                    const growthRate = 1.02;
+                    const currentPop = this.agents.length;
+                    const newPop = Math.floor(currentPop * growthRate) - currentPop;
+                    
+                    for (let i = 0; i < newPop; i++) {
+                        if (this.settlements.length > 0) {
+                            const settlement = this.settlements[0];
+                            this.createAgent(
+                                settlement.x + (Math.random() - 0.5) * 20,
+                                settlement.z + (Math.random() - 0.5) * 20
+                            );
+                        }
+                    }
+                }
+                
+                // Settlement expansion
+                if (this.year % 500 === 0 && this.agents.length > 200) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 30 + Math.random() * 30;
+                    this.createSettlement(
+                        Math.cos(angle) * distance,
+                        Math.sin(angle) * distance,
+                        'village'
+                    );
+                    
+                    this.addEvent(`New settlement founded: ${this.settlements[this.settlements.length - 1].name}`);
+                }
+                
+                // Innovation discovery
+                if (this.year % 200 === 0 && Math.random() < 0.3) {
+                    const innovations = {
+                        vedic: ['Yoga', 'Ayurveda', 'Vedic Math', 'Sanskrit'],
+                        gnostic: ['Alchemy', 'Sacred Geometry', 'Prophecy', 'Mysticism'],
+                        hybrid: ['Trade Networks', 'Cultural Fusion', 'Diplomacy'],
+                        tech: ['Nanotech', 'Neural Interfaces', 'Space Travel', 'Immortality']
+                    };
+                    
+                    const worldInnovations = innovations[this.currentWorld];
+                    const innovation = worldInnovations[Math.floor(Math.random() * worldInnovations.length)];
+                    
+                    if (!this.worldConfigs[this.currentWorld].innovations.includes(innovation)) {
+                        this.unlockInnovation(innovation);
+                        this.addEvent(`Innovation discovered: ${innovation}`);
+                    }
+                }
+                
+                // Random events
+                if (Math.random() < 0.02) {
+                    this.generateRandomEvent();
+                }
+                
+                // Update data tracking
+                this.simulationData.population.push({
+                    year: this.year,
+                    count: this.agents.length
+                });
+                
+                this.updateUI();
+            }
+            
+            generateRandomEvent() {
+                const events = {
+                    vedic: [
+                        'Sacred ritual increases crop yields',
+                        'Meditation breakthrough enhances wisdom',
+                        'Divine blessing received at temple'
+                    ],
+                    gnostic: [
+                        'Hidden knowledge revealed in ancient texts',
+                        'Prophetic vision guides the people',
+                        'Mystery school attracts new initiates'
+                    ],
+                    hybrid: [
+                        'Cultural exchange enriches society',
+                        'Trade caravan brings exotic goods',
+                        'Diplomatic alliance strengthens bonds'
+                    ],
+                    tech: [
+                        'AI breakthrough accelerates research',
+                        'Bioengineering eliminates disease',
+                        'Quantum computer solves complex problem'
+                    ]
+                };
+                
+                const worldEvents = events[this.currentWorld];
+                const event = worldEvents[Math.floor(Math.random() * worldEvents.length)];
+                this.addEvent(event);
+            }
+            
+            addEvent(text) {
+                const eventLog = document.getElementById('eventLog');
+                const eventDiv = document.createElement('div');
+                eventDiv.className = `event ${this.currentWorld}`;
+                eventDiv.innerHTML = `
+                    <div class="event-year">Year ${this.year}</div>
+                    ${text}
+                `;
+                
+                // Insert at beginning (after title)
+                const title = eventLog.querySelector('.panel-title');
+                if (title.nextSibling) {
+                    eventLog.insertBefore(eventDiv, title.nextSibling);
+                } else {
+                    eventLog.appendChild(eventDiv);
+                }
+                
+                // Keep only last 10 events
+                const events = eventLog.querySelectorAll('.event');
+                if (events.length > 10) {
+                    events[events.length - 1].remove();
+                }
+                
+                this.simulationData.events.push({
+                    year: this.year,
+                    text: text,
+                    world: this.currentWorld
+                });
+            }
+            
+            unlockInnovation(name) {
+                const config = this.worldConfigs[this.currentWorld];
+                if (!config.innovations.includes(name)) {
+                    config.innovations.push(name);
+                    this.updateInnovationGrid();
+                }
+            }
+            
+            updateInnovationGrid() {
+                const grid = document.getElementById('innovationGrid');
+                grid.innerHTML = '';
+                
+                const allInnovations = {
+                    vedic: [
+                        { name: 'Fire', icon: '🔥' },
+                        { name: 'Agriculture', icon: '🌾' },
+                        { name: 'Yoga', icon: '🧘' },
+                        { name: 'Ayurveda', icon: '🌿' },
+                        { name: 'Sanskrit', icon: '📜' },
+                        { name: 'Vedic Math', icon: '🔢' }
+                    ],
+                    gnostic: [
+                        { name: 'Writing', icon: '✍️' },
+                        { name: 'Alchemy', icon: '⚗️' },
+                        { name: 'Geometry', icon: '📐' },
+                        { name: 'Prophecy', icon: '🔮' },
+                        { name: 'Mysticism', icon: '✨' },
+                        { name: 'Astronomy', icon: '🌟' }
+                    ],
+                    hybrid: [
+                        { name: 'Trade', icon: '🤝' },
+                        { name: 'Currency', icon: '💰' },
+                        { name: 'Fusion', icon: '🔄' },
+                        { name: 'Diplomacy', icon: '🕊️' },
+                        { name: 'Art', icon: '🎨' },
+                        { name: 'Music', icon: '🎵' }
+                    ],
+                    tech: [
+                        { name: 'AGI', icon: '🤖' },
+                        { name: 'Biotech', icon: '🧬' },
+                        { name: 'Quantum', icon: '⚛️' },
+                        { name: 'Nanotech', icon: '🔬' },
+                        { name: 'Neural', icon: '🧠' },
+                        { name: 'Space', icon: '🚀' }
+                    ]
+                };
+                
+                const worldInnovations = allInnovations[this.currentWorld] || [];
+                const unlocked = this.worldConfigs[this.currentWorld].innovations;
+                
+                worldInnovations.forEach(innovation => {
+                    const div = document.createElement('div');
+                    div.className = 'innovation';
+                    if (unlocked.includes(innovation.name)) {
+                        div.classList.add('unlocked');
+                    }
+                    div.innerHTML = `
+                        ${innovation.icon}
+                        <div class="innovation-name">${innovation.name}</div>
+                    `;
+                    grid.appendChild(div);
+                });
+            }
+            
+            updateSettlementList() {
+                const list = document.getElementById('settlementList');
+                list.innerHTML = '';
+                
+                this.settlements.forEach(settlement => {
+                    const item = document.createElement('div');
+                    item.className = 'settlement-item';
+                    item.innerHTML = `
+                        <div>
+                            <div class="settlement-name">${settlement.name}</div>
+                            <div class="settlement-pop">Pop: ${settlement.population}</div>
+                        </div>
+                    `;
+                    item.addEventListener('click', () => {
+                        this.camera.position.set(
+                            settlement.x + 20,
+                            30,
+                            settlement.z + 20
+                        );
+                        this.camera.lookAt(settlement.x, 0, settlement.z);
+                    });
+                    list.appendChild(item);
+                });
+            }
+            
+            updateUI() {
+                // Update header stats
+                document.getElementById('yearHeader').textContent = this.year;
+                document.getElementById('popHeader').textContent = this.agents.length;
+                document.getElementById('settlementsHeader').textContent = this.settlements.length;
+                
+                // Update year display
+                document.getElementById('yearDisplay').textContent = `Year ${this.year}`;
+                
+                // Update era label
+                let era = 'Stone Age';
+                if (this.year > 8000) era = 'Information Age';
+                else if (this.year > 6000) era = 'Industrial Age';
+                else if (this.year > 4000) era = 'Iron Age';
+                else if (this.year > 2000) era = 'Bronze Age';
+                document.getElementById('eraLabel').textContent = era;
+                
+                // Update timeline progress
+                const progress = (this.year / 10000) * 100;
+                document.getElementById('timelineProgress').style.width = `${progress}%`;
+                
+                // Update metrics
+                const totalResources = this.resources.reduce((sum, r) => sum + r.userData.amount, 0);
+                document.getElementById('populationMetric').textContent = this.agents.length;
+                document.getElementById('resourcesMetric').textContent = totalResources;
+                document.getElementById('techMetric').textContent = 
+                    (1 + this.worldConfigs[this.currentWorld].innovations.length * 0.5).toFixed(1);
+                document.getElementById('happinessMetric').textContent = 
+                    Math.floor(75 + Math.random() * 20) + '%';
+                
+                this.updateInnovationGrid();
+            }
+            
+            updateGraphs() {
+                // Population graph
+                const popCanvas = document.getElementById('popGraph');
+                const popCtx = popCanvas.getContext('2d');
+                popCanvas.width = popCanvas.parentElement.clientWidth - 40;
+                popCanvas.height = 200;
+                
+                popCtx.clearRect(0, 0, popCanvas.width, popCanvas.height);
+                popCtx.strokeStyle = '#667eea';
+                popCtx.lineWidth = 2;
+                popCtx.beginPath();
+                
+                const popData = this.simulationData.population.slice(-50);
+                popData.forEach((point, i) => {
+                    const x = (i / popData.length) * popCanvas.width;
+                    const y = popCanvas.height - (point.count / 500) * popCanvas.height;
+                    if (i === 0) popCtx.moveTo(x, y);
+                    else popCtx.lineTo(x, y);
+                });
+                popCtx.stroke();
+                
+                // Similar for other graphs...
+            }
+            
+            updateComparison() {
+                const panel = document.getElementById('comparisonPanel');
+                panel.innerHTML = '<button class="close-btn" onclick="sim.closeComparison()">✕</button>';
+                
+                Object.keys(this.worldConfigs).forEach(worldKey => {
+                    const config = this.worldConfigs[worldKey];
+                    const column = document.createElement('div');
+                    column.className = 'world-column';
+                    column.innerHTML = `
+                        <h3 style="color: #${config.color.toString(16).padStart(6, '0')}">${config.name}</h3>
+                        <div class="comparison-stat">
+                            <div class="comparison-label">Population</div>
+                            <div class="comparison-value">${config.startingPop}</div>
+                            <div class="comparison-bar">
+                                <div class="comparison-fill" style="background: #${config.color.toString(16).padStart(6, '0')}; width: ${(config.startingPop / 200) * 100}%"></div>
+                            </div>
+                        </div>
+                        <div class="comparison-stat">
+                            <div class="comparison-label">Tech Level</div>
+                            <div class="comparison-value">${(config.techMultiplier * 3).toFixed(1)}</div>
+                            <div class="comparison-bar">
+                                <div class="comparison-fill" style="background: #${config.color.toString(16).padStart(6, '0')}; width: ${config.techMultiplier * 33}%"></div>
+                            </div>
+                        </div>
+                        <div class="comparison-stat">
+                            <div class="comparison-label">Innovations</div>
+                            <div class="comparison-value">${config.innovations.length}</div>
+                        </div>
+                    `;
+                    panel.appendChild(column);
+                });
+            }
+            
+            closeComparison() {
+                document.getElementById('comparisonPanel').classList.remove('active');
+            }
+            
+            reset() {
+                this.year = 0;
+                this.isPlaying = false;
+                this.simulationData = {
+                    population: [],
+                    resources: [],
+                    innovations: [],
+                    conflicts: [],
+                    events: []
+                };
+                this.switchWorld(this.currentWorld);
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                // Run simulation
+                this.simulate();
+                
+                // Render
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        
+        // Global functions for UI
+        function closeGraphs() {
+            document.getElementById('graphsPanel').classList.remove('active');
+        }
+        
+        function closeComparison() {
+            document.getElementById('comparisonPanel').classList.remove('active');
+        }
+        
+        // Initialize simulator
+        const sim = new CivilizationSimulator();
+    </script>
+</body>
+</html>

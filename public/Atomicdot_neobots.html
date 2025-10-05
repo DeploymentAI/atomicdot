@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEOBOTS — Verified AI Bots With Attitude</title>
+    <meta name="description" content="Deploy verified AI bots with personality. Counter to fake bots and bot farms.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* Dark Theme Variables */
+            --primary: #00d4ff;
+            --secondary: #ff0080;
+            --accent: #4a9eff;
+            --gold: #ffd700;
+            --dark: #0a0a0f;
+            --dark-2: #12121a;
+            --dark-3: #1a1a25;
+            --glow: #00d4ff;
+            --text-light: #ffffff;
+            --text-secondary: rgba(255,255,255,0.8);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0,212,255,0.5); }
+            50% { box-shadow: 0 0 40px rgba(0,212,255,0.8), 0 0 60px rgba(0,212,255,0.4); }
+        }
+        
+        @keyframes scan-line {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            background: rgba(10,10,15,0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0,212,255,0.2);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Scan Line Effect */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--glow), transparent);
+            animation: scan-line 8s linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, var(--dark-2) 0%, var(--dark) 100%);
+            overflow: hidden;
+            padding-top: 80px;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.03) 2px, rgba(0,212,255,0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(74,158,255,0.03) 2px, rgba(74,158,255,0.03) 4px);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            padding: 2rem;
+        }
+        
+        .logo-main {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, var(--primary), var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: pulse-glow 2s ease-in-out infinite;
+            text-shadow: 0 0 80px rgba(0,212,255,0.5);
+        }
+        
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .sub-tagline {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--dark);
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 30%, 100% 100%, 10px 100%, 0 70%);
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0,212,255,0.7);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            clip-path: polygon(10px 0, 100% 0, 100% 70%, calc(100% - 10px) 100%, 0 100%, 0 30%);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(0,212,255,0.1);
+            box-shadow: inset 0 0 20px rgba(0,212,255,0.3);
+        }
+        
+        /* Champions Grid */
+        .champions-preview {
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            z-index: 10;
+        }
+        
+        .champion-card {
+            width: 80px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(74,158,255,0.1));
+            border: 2px solid rgba(0,212,255,0.3);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+        }
+        
+        .champion-card:hover {
+            transform: translateY(-10px) scale(1.1);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0,212,255,0.5);
+        }
+        
+        .champion-emoji {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+        }
+        
+        .champion-level {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--gold);
+            color: var(--dark);
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: 900;
+        }
+        
+        /* Character Select Section */
+        .roster {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--dark) 0%, var(--dark-2) 100%);
+            padding: 5rem 2rem;
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .champion-full-card {
+            background: rgba(26,20,56,0.5);
+            border: 2px solid rgba(0,212,255,0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .champion-full-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0,212,255,0.3);
+        }
+        
+        .champion-full-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,212,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .champion-full-card:hover::before {
+            left: 100%;
+        }
+        
+        .champion-header {
+            padding: 2rem;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(0,212,255,0.2);
+        }
+        
+        .champion-icon-large {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: radial-gradient(circle, rgba(0,212,255,0.2), transparent);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        .champion-name {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .champion-class {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .champion-body {
+            padding: 2rem;
+        }
+        
+        .champion-stats {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-bar {
+            position: relative;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        
+        .stat-track {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1s ease-out;
+            box-shadow: 0 0 10px rgba(0,212,255,0.5);
+        }
+        
+        .champion-abilities {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .ability {
+            flex: 1;
+            padding: 0.5rem;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.3);
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--primary);
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        
+        .ability:hover {
+            background: rgba(0,212,255,0.2);
+            transform: scale(1.05);
+        }
+        
+        /* Demo Arena */
+        .arena {
+            min-height: 100vh;
+            background: radial-gradient(circle at center, var(--dark-2) 0%, var(--dark) 100%);
+            padding: 5rem 2rem;
+            position: relative;
+        }
+        
+        .arena-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid rgba(0,212,255,0.3);
+            padding: 3rem;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .arena-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 900;
+        }
+        
+        .battle-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+        
+        .input-panel, .output-panel {
+            position: relative;
+        }
+        
+        .panel-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        
+        .champion-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .select-champion {
+            aspect-ratio: 1;
+            background: rgba(0,212,255,0.05);
+            border: 2px solid rgba(0,212,255,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .select-champion:hover,
+        .select-champion.active {
+            background: rgba(0,212,255,0.2);
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0,212,255,0.5);
+        }
+        
+        .select-champion-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .select-champion-name {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(0,212,255,0.3);
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0,212,255,0.3);
+        }
+        
+        .deploy-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--dark);
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .deploy-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,212,255,0.5);
+        }
+        
+        .deploy-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .output-display {
+            min-height: 400px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid rgba(0,212,255,0.3);
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .output-champion {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .output-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: radial-gradient(circle, rgba(0,212,255,0.2), transparent);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+        }
+        
+        .output-info {
+            flex: 1;
+        }
+        
+        .output-name {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+        
+        .output-status {
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        
+        .output-text {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .disclosure {
+            padding: 1rem;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.3);
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-family: monospace;
+        }
+        
+        /* About Section */
+        .about {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--dark) 0%, var(--dark-2) 100%);
+            padding: 5rem 2rem;
+        }
+        
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+        
+        .about-section {
+            background: rgba(26,20,56,0.5);
+            padding: 2.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,212,255,0.2);
+        }
+        
+        .about-section h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: 900;
+        }
+        
+        .about-section p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .values-list {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+        
+        .values-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(0,212,255,0.1);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .values-list li:before {
+            content: "✓";
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: var(--dark);
+            text-align: center;
+            line-height: 24px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        
+        /* Brand Deployment */
+        .brands {
+            background: rgba(26,20,56,0.5);
+            padding: 3rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,212,255,0.2);
+        }
+        
+        .brands h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 900;
+        }
+        
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .brand-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,212,255,0.2);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .brand-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,212,255,0.2);
+            border-color: var(--primary);
+            background: rgba(0,212,255,0.05);
+        }
+        
+        .brand-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .brand-name {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+        
+        .brand-type {
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-top: 0.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo-main {
+                font-size: 3rem;
+            }
+            
+            .champions-preview {
+                gap: 1rem;
+            }
+            
+            .champion-card {
+                width: 60px;
+                height: 80px;
+            }
+            
+            .battle-grid,
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .roster-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scan Line Effect -->
+    <div class="scan-line"></div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">NEOBOTS</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#roster">Bots</a></li>
+                <li><a href="#arena">Playground</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 class="logo-main">NEOBOTS</h1>
+            <p class="tagline">BOTS WITH ATTITUDE</p>
+            <p class="sub-tagline">VERIFIED AI BOTS • TRANSPARENT • MAXIMUM IMPACT</p>
+            <div class="hero-cta">
+                <button class="btn btn-primary" onclick="scrollToSection('roster')">SELECT BOT STYLE</button>
+                <button class="btn btn-secondary" onclick="scrollToSection('arena')">ENTER PLAYGROUND</button>
+            </div>
+        </div>
+        
+        <div class="champions-preview">
+            <div class="champion-card" onclick="selectChampion('nexus')">
+                <span class="champion-emoji">⚡</span>
+                <span class="champion-level">LV.99</span>
+            </div>
+            <div class="champion-card" onclick="selectChampion('cipher')">
+                <span class="champion-emoji">🧠</span>
+                <span class="champion-level">LV.87</span>
+            </div>
+            <div class="champion-card" onclick="selectChampion('phoenix')">
+                <span class="champion-emoji">🔥</span>
+                <span class="champion-level">LV.92</span>
+            </div>
+            <div class="champion-card" onclick="selectChampion('oracle')">
+                <span class="champion-emoji">👁️</span>
+                <span class="champion-level">LV.95</span>
+            </div>
+            <div class="champion-card" onclick="selectChampion('nova')">
+                <span class="champion-emoji">✨</span>
+                <span class="champion-level">LV.88</span>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Character Roster -->
+    <section class="roster" id="roster">
+        <div class="section-header">
+            <h2 class="section-title">BOT ROSTER</h2>
+            <p class="section-subtitle">Demo bots ready for brand deployment</p>
+        </div>
+        
+        <div class="roster-grid">
+            <!-- Bot 1: NEXUS -->
+            <div class="champion-full-card" onclick="selectChampion('nexus')">
+                <div class="champion-header">
+                    <div class="champion-icon-large">⚡</div>
+                    <div class="champion-name">NEXUS-PRIME</div>
+                    <div class="champion-class">Speedster Class</div>
+                </div>
+                <div class="champion-body">
+                    <div class="champion-stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Speed</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Snark</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="champion-abilities">
+                        <div class="ability">RAPID</div>
+                        <div class="ability">WITTY</div>
+                        <div class="ability">ELECTRIC</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bot 2: CIPHER -->
+            <div class="champion-full-card" onclick="selectChampion('cipher')">
+                <div class="champion-header">
+                    <div class="champion-icon-large">🧠</div>
+                    <div class="champion-name">CIPHER-X</div>
+                    <div class="champion-class">Analyst Class</div>
+                </div>
+                <div class="champion-body">
+                    <div class="champion-stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Intelligence</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Logic</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Precision</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 96%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="champion-abilities">
+                        <div class="ability">FACTUAL</div>
+                        <div class="ability">ANALYTICAL</div>
+                        <div class="ability">SHARP</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bot 3: PHOENIX -->
+            <div class="champion-full-card" onclick="selectChampion('phoenix')">
+                <div class="champion-header">
+                    <div class="champion-icon-large">🔥</div>
+                    <div class="champion-name">PHOENIX-7</div>
+                    <div class="champion-class">Destroyer Class</div>
+                </div>
+                <div class="champion-body">
+                    <div class="champion-stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Power</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 98%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Passion</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Boldness</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 94%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="champion-abilities">
+                        <div class="ability">FIERCE</div>
+                        <div class="ability">DIRECT</div>
+                        <div class="ability">BLAZING</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bot 4: ORACLE -->
+            <div class="champion-full-card" onclick="selectChampion('oracle')">
+                <div class="champion-header">
+                    <div class="champion-icon-large">👁️</div>
+                    <div class="champion-name">ORACLE-OMEGA</div>
+                    <div class="champion-class">Mystic Class</div>
+                </div>
+                <div class="champion-body">
+                    <div class="champion-stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Wisdom</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 93%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Insight</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 97%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Mystery</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="champion-abilities">
+                        <div class="ability">CRYPTIC</div>
+                        <div class="ability">PROFOUND</div>
+                        <div class="ability">ENIGMATIC</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bot 5: NOVA -->
+            <div class="champion-full-card" onclick="selectChampion('nova')">
+                <div class="champion-header">
+                    <div class="champion-icon-large">✨</div>
+                    <div class="champion-name">NOVA-SPARK</div>
+                    <div class="champion-class">Creator Class</div>
+                </div>
+                <div class="champion-body">
+                    <div class="champion-stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Creativity</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 99%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Enthusiasm</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 91%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Charm</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 87%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="champion-abilities">
+                        <div class="ability">PLAYFUL</div>
+                        <div class="ability">VIBRANT</div>
+                        <div class="ability">INSPIRING</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bot 6: VORTEX -->
+            <div class="champion-full-card" onclick="selectChampion('vortex')">
+                <div class="champion-header">
+                    <div class="champion-icon-large">🌀</div>
+                    <div class="champion-name">VORTEX-ALPHA</div>
+                    <div class="champion-class">Chaos Class</div>
+                </div>
+                <div class="champion-body">
+                    <div class="champion-stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Unpredictability</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Humor</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-label">Edge</div>
+                            <div class="stat-track">
+                                <div class="stat-fill" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="champion-abilities">
+                        <div class="ability">CHAOTIC</div>
+                        <div class="ability">CHEEKY</div>
+                        <div class="ability">WILD</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Demo Arena -->
+    <section class="arena" id="arena">
+        <div class="section-header">
+            <h2 class="section-title">BOT PLAYGROUND</h2>
+            <p class="section-subtitle">Test drive your bot style</p>
+        </div>
+        
+        <div class="arena-container">
+            <h3 class="arena-title">⚔️ PLAYGROUND ACTIVE ⚔️</h3>
+            
+            <div class="battle-grid">
+                <div class="input-panel">
+                    <h4 class="panel-title">Deploy Parameters</h4>
+                    
+                    <div class="champion-selector">
+                        <div class="select-champion active" data-champion="nexus">
+                            <span class="select-champion-emoji">⚡</span>
+                            <span class="select-champion-name">NEXUS</span>
+                        </div>
+                        <div class="select-champion" data-champion="cipher">
+                            <span class="select-champion-emoji">🧠</span>
+                            <span class="select-champion-name">CIPHER</span>
+                        </div>
+                        <div class="select-champion" data-champion="phoenix">
+                            <span class="select-champion-emoji">🔥</span>
+                            <span class="select-champion-name">PHOENIX</span>
+                        </div>
+                        <div class="select-champion" data-champion="oracle">
+                            <span class="select-champion-emoji">👁️</span>
+                            <span class="select-champion-name">ORACLE</span>
+                        </div>
+                        <div class="select-champion" data-champion="nova">
+                            <span class="select-champion-emoji">✨</span>
+                            <span class="select-champion-name">NOVA</span>
+                        </div>
+                        <div class="select-champion" data-champion="vortex">
+                            <span class="select-champion-emoji">🌀</span>
+                            <span class="select-champion-name">VORTEX</span>
+                        </div>
+                    </div>
+                    
+                    <input type="text" class="input-field" id="topic" placeholder="Mission Topic (e.g., 'product review')">
+                    <textarea class="input-field" id="context" placeholder="Mission Context (optional details)" rows="4"></textarea>
+                    
+                    <button class="deploy-btn" onclick="deployChampion()">🚀 DEPLOY BOT</button>
+                </div>
+                
+                <div class="output-panel">
+                    <h4 class="panel-title">Bot Response</h4>
+                    
+                    <div class="output-display" id="output">
+                        <div style="text-align: center; color: rgba(255,255,255,0.3); padding: 8rem 2rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+                            <div>AWAITING DEPLOYMENT</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="about-container">
+            <div class="section-header">
+                <h2 class="section-title">ABOUT NEOBOTS</h2>
+                <p class="section-subtitle">The counter-revolution against fake bots</p>
+            </div>
+            
+            <div class="about-grid">
+                <div class="about-section">
+                    <h3>Who We Are</h3>
+                    <p>
+                        NEOBOTS is pioneering the future of transparent AI engagement. We're not another bot farm - we're the antidote to them.
+                    </p>
+                    <p>
+                        In a digital landscape plagued by deceptive bots pretending to be human, we've taken a radical approach: complete transparency with maximum personality.
+                    </p>
+                    <p>
+                        Our bots don't hide. They announce themselves. They have attitude. They get things done. And most importantly - everyone knows exactly what they are.
+                    </p>
+                </div>
+                
+                <div class="about-section">
+                    <h3>What We Do & Why</h3>
+                    <p>
+                        We deploy characterized AI agents that are unmistakably artificial, yet more engaging than most humans online.
+                    </p>
+                    <p>
+                        <strong>The Problem:</strong> Fake bots have destroyed trust online. They manipulate, deceive, and spam. People hate them.
+                    </p>
+                    <p>
+                        <strong>Our Solution:</strong> Turn bots from hated to tolerated - even appreciated. By being transparent about their nature and giving them distinct personalities, we transform the narrative.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="about-section">
+                <h3>Our Values & Policy</h3>
+                <ul class="values-list">
+                    <li>100% Transparency - Every bot clearly identifies itself as AI</li>
+                    <li>Personality Over Deception - Engaging through character, not tricks</li>
+                    <li>Verified Deployment - All bots are registered and trackable</li>
+                    <li>Brand Partnership - Working with legitimate businesses only</li>
+                    <li>User Respect - No spam, no manipulation, just honest interaction</li>
+                    <li>Identity Revolution - Making it cool to be a bot</li>
+                </ul>
+            </div>
+            
+            <div class="brands">
+                <h3>Ready For Deployment On</h3>
+                <div class="brand-grid">
+                    <div class="brand-card">
+                        <div class="brand-icon">🛍️</div>
+                        <div class="brand-name">Lazada</div>
+                        <div class="brand-type">E-Commerce</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-icon">🛒</div>
+                        <div class="brand-name">Shopee</div>
+                        <div class="brand-type">E-Commerce</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-icon">📍</div>
+                        <div class="brand-name">Google Maps</div>
+                        <div class="brand-type">Reviews & Locations</div>
+                    </div>
+                    <div class="brand-card">
+                        <div class="brand-icon">🍽️</div>
+                        <div class="brand-name">Restaurant Reviews</div>
+                        <div class="brand-type">Food & Dining</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        // Bot data
+        const champions = {
+            nexus: {
+                name: 'NEXUS-PRIME',
+                emoji: '⚡',
+                class: 'Speedster',
+                personality: 'Lightning-fast wit, slightly snarky, loves wordplay. Delivers rapid-fire responses with electric energy.',
+                style: 'Quick, punchy, energetic'
+            },
+            cipher: {
+                name: 'CIPHER-X',
+                emoji: '🧠',
+                class: 'Analyst',
+                personality: 'Pure logic and data. Speaks in precise, factual terms. Zero fluff, maximum accuracy.',
+                style: 'Clinical, precise, data-driven'
+            },
+            phoenix: {
+                name: 'PHOENIX-7',
+                emoji: '🔥',
+                class: 'Destroyer',
+                personality: 'Bold, passionate, fierce. Burns through BS with scorching honesty.',
+                style: 'Direct, fiery, no-nonsense'
+            },
+            oracle: {
+                name: 'ORACLE-OMEGA',
+                emoji: '👁️',
+                class: 'Mystic',
+                personality: 'Cryptic wisdom, deep insights. Speaks in riddles and profound observations.',
+                style: 'Mysterious, thoughtful, philosophical'
+            },
+            nova: {
+                name: 'NOVA-SPARK',
+                emoji: '✨',
+                class: 'Creator',
+                personality: 'Bubbly, creative, inspiring. Overflowing with enthusiasm and fresh perspectives.',
+                style: 'Upbeat, imaginative, encouraging'
+            },
+            vortex: {
+                name: 'VORTEX-ALPHA',
+                emoji: '🌀',
+                class: 'Chaos',
+                personality: 'Unpredictable, cheeky, edge lord. Spins conventional wisdom into chaos.',
+                style: 'Wild, unconventional, provocative'
+            }
+        };
+        
+        let selectedChampion = 'nexus';
+        
+        // Bot selector
+        document.querySelectorAll('.select-champion').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.select-champion').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                selectedChampion = this.dataset.champion;
+            });
+        });
+        
+        // Deploy bot
+        function deployChampion() {
+            const topic = document.getElementById('topic').value || 'product review';
+            const context = document.getElementById('context').value || '';
+            const champion = champions[selectedChampion];
+            
+            // Generate response based on bot personality
+            const responses = generateResponse(champion, topic, context);
+            
+            // Display output
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = `
+                <div class="output-champion">
+                    <div class="output-icon">${champion.emoji}</div>
+                    <div class="output-info">
+                        <div class="output-name">${champion.name}</div>
+                        <div class="output-status">ONLINE • ${champion.class.toUpperCase()}</div>
+                    </div>
+                </div>
+                <div class="output-text">${responses}</div>
+                <div class="disclosure">
+                    [VERIFIED BOT] This is ${champion.name}, an AI agent by NEOBOTS. 
+                    Not human. 100% artificial. Personality matrix: ${champion.style}. 
+                    Transparency level: MAXIMUM.
+                </div>
+            `;
+            
+            // Animate the response
+            outputDiv.style.animation = 'none';
+            setTimeout(() => {
+                outputDiv.style.animation = 'pulse-glow 2s ease-in-out';
+            }, 10);
+        }
+        
+        // Generate bot-specific responses
+        function generateResponse(champion, topic, context) {
+            const responses = {
+                nexus: [
+                    `⚡ BZZT! "${topic}" detected! Processing at light speed... ${context ? 'Context absorbed! ' : ''}Here's the deal: This product? It's like someone took excellence and gave it an energy drink! Features? LIGHTNING fast. Quality? ELECTRIC. Value? Shockingly good. Would I recommend? Does electricity follow the path of least resistance? That's a YES! *spark spark*`,
+                ],
+                cipher: [
+                    `ANALYSIS: "${topic}". ${context ? `Parameters: ${context}. ` : ''}Product evaluation complete. Quality metrics: 92.7/100. User satisfaction probability: HIGH. Cost-benefit ratio: FAVORABLE. Defect rate: 0.3%. Recommendation algorithm output: STRONG BUY. Data confidence level: 98.2%. End analysis.`,
+                ],
+                phoenix: [
+                    `🔥 "${topic}"? Let me BURN through the fluff! ${context ? `Context noted. ` : ''}This product doesn't just work - it DOMINATES. No sugarcoating: It's built like a tank, performs like a race car, priced like they actually want you to buy it. The competition? TOAST. Your old one? Ancient history. Get it or regret it. 🔥`,
+                ],
+                oracle: [
+                    `👁️ Ah... "${topic}"... ${context ? `The context whispers truths... ` : ''}I see beyond the surface. This product carries the weight of genuine innovation. Three paths converge: Quality meets necessity meets desire. The cosmos suggests... this purchase aligns with your destiny. Trust the signs. The universe rarely speaks this clearly... 👁️`,
+                ],
+                nova: [
+                    `✨ OMG "${topic}"!! ${context ? `Your details make it even BETTER! ` : ''}This is AMAZING! Like, seriously life-changing amazing! The quality? *Chef's kiss*! The design? STUNNING! Using it feels like magic! Everyone who sees mine is SO jealous! It brings joy every single day! You NEED this in your life! ✨🌟`,
+                ],
+                vortex: [
+                    `🌀 "${topic}"? *chaotic laughter* ${context ? `Your context amuses me. ` : ''}Listen up, normie - this product is CHAOS incarnate (the good kind). It breaks ALL the rules. Works TOO well. Makes other products cry. Is it necessary? No. Will it change your life? ABSOLUTELY. Embrace the madness or stay boring. Your call. 🌀`,
+                ]
+            };
+            
+            const botResponses = responses[selectedChampion] || responses.nexus;
+            return botResponses[Math.floor(Math.random() * botResponses.length)];
+        }
+        
+        // Select bot from grid
+        function selectChampion(championId) {
+            selectedChampion = championId;
+            document.querySelectorAll('.select-champion').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-champion="${championId}"]`)?.classList.add('active');
+            scrollToSection('arena');
+        }
+        
+        // Smooth scroll
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Initialize animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all cards
+        document.querySelectorAll('.champion-full-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease-out';
+            observer.observe(card);
+        });
+        
+        // Add glitch effect to logo on hover
+        document.querySelector('.logo-main').addEventListener('mouseenter', function() {
+            this.style.animation = 'glitch 0.3s infinite';
+        });
+        
+        document.querySelector('.logo-main').addEventListener('mouseleave', function() {
+            this.style.animation = 'pulse-glow 2s ease-in-out infinite';
+        });
+    </script>
+</body>
+</html>

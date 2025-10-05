@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Reality - Journey Through Scale</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box}
+body {background:#000;color:#fff;font-family:'Segoe UI',system-ui;height:100vh;overflow:hidden;position:relative}
+
+.viewport {width:100%;height:100%;position:relative;overflow:hidden}
+.scene {position:absolute;width:100%;height:100%;background-size:cover;background-position:center;opacity:0;transition:opacity 2s ease}
+.scene.active {opacity:1}
+.scene.zooming {animation:zoomIn 3s ease-out forwards}
+@keyframes zoomIn {from{transform:scale(1)}to{transform:scale(50)}}
+@keyframes zoomOut {from{transform:scale(50)}to{transform:scale(1)}}
+
+/* UI */
+.header {position:absolute;top:0;width:100%;padding:20px;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent);z-index:100}
+.title {font-size:2em;letter-spacing:0.2em;font-weight:100;text-align:center;text-shadow:0 0 30px rgba(100,200,255,0.8)}
+.scale-indicator {position:absolute;top:80px;left:50%;transform:translateX(-50%);font-size:1.2em;padding:10px 30px;background:rgba(0,0,0,0.6);border:1px solid rgba(100,200,255,0.3);border-radius:30px;backdrop-filter:blur(10px);transition:all 0.5s}
+.scale-value {color:#4fc3f7;font-weight:bold}
+
+.controls {position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:15px;z-index:100}
+button {padding:12px 25px;background:rgba(100,200,255,0.1);color:#fff;border:1px solid rgba(100,200,255,0.5);border-radius:25px;cursor:pointer;transition:all 0.3s;backdrop-filter:blur(5px)}
+button:hover {background:rgba(100,200,255,0.3);transform:translateY(-2px)}
+button:disabled {opacity:0.5;cursor:not-allowed}
+
+.progress-bar {position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:400px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.progress-fill {height:100%;background:linear-gradient(90deg,#4fc3f7,#2196f3);width:0;transition:width 3s ease}
+
+.loading {position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:1000}
+.loading-spinner {width:50px;height:50px;border:3px solid rgba(100,200,255,0.3);border-top-color:#4fc3f7;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px}
+@keyframes spin {to{transform:rotate(360deg)}}
+
+/* Particle overlay */
+.particles {position:absolute;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 1s}
+.particles.active {opacity:1}
+.particle {position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:float-particle 10s linear infinite}
+@keyframes float-particle {
+  from {transform:translateY(100vh) translateX(0)}
+  to {transform:translateY(-100px) translateX(100px)}
+}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">
+  <div class="loading-spinner"></div>
+  <div>Initializing Quantum Journey...</div>
+</div>
+
+<div class="viewport">
+  <div class="scene" data-scale="10⁰" data-name="Human Scale"></div>
+  <div class="scene" data-scale="10⁻⁹" data-name="Molecular"></div>
+  <div class="scene" data-scale="10⁻¹⁰" data-name="Atomic"></div>
+  <div class="scene" data-scale="10⁻¹⁵" data-name="Quantum Realm"></div>
+  <div class="scene" data-scale="10⁻³⁵" data-name="Spacetime Fabric"></div>
+  <div class="scene" data-scale="10⁷" data-name="Earth"></div>
+  <div class="scene" data-scale="10²¹" data-name="Galactic"></div>
+  <div class="scene" data-scale="10²⁶" data-name="Cosmic Web"></div>
+  <div class="particles" id="particles"></div>
+</div>
+
+<div class="header">
+  <h1 class="title">QUANTUM REALITY</h1>
+  <div class="scale-indicator">
+    <span id="scaleName">Human Scale</span> - <span class="scale-value" id="scaleValue">10⁰ meters</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="startBtn">Begin Journey</button>
+  <button id="zoomBtn" disabled>Zoom Deeper</button>
+  <button id="reverseBtn" disabled>Reverse</button>
+  <button id="soundBtn">🔊</button>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-fill" id="progress"></div>
+</div>
+
+<script>
+// Image mapping - update these filenames to match your actual files
+const images = [
+  'hand.jpg',      // Human scale
+  'molecules.jpg', // Molecular
+  'atom.jpg',      // Atomic
+  'quantum.jpg',   // Quantum
+  'spacetime.jpg', // Spacetime fabric
+  'earth.jpg',     // Earth
+  'galaxy.jpg',    // Galaxy
+  'cosmic.jpg'     // Cosmic web
+];
+
+const scenes = document.querySelectorAll('.scene');
+let currentIndex = 0;
+let audioContext;
+let soundEnabled = true;
+let journeyStarted = false;
+let isReversing = false;
+
+// Initialize images
+scenes.forEach((scene, i) => {
+  scene.style.backgroundImage = `url('${images[i]}')`;
+});
+
+// Sound system
+function initAudio() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function playZoomSound(frequency = 440, duration = 0.5) {
+  if (!soundEnabled || !audioContext) return;
+  
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.5, audioContext.currentTime + duration);
+  
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+  
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration);
+}
+
+function playAmbient(index) {
+  if (!soundEnabled || !audioContext) return;
+  
+  const frequencies = [220, 180, 150, 110, 80, 260, 320, 400];
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(frequencies[index], audioContext.currentTime);
+  gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+  
+  oscillator.start();
+  setTimeout(() => oscillator.stop(), 2000);
+}
+
+// Create particles
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 50; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+    container.appendChild(particle);
+  }
+}
+
+// Navigation
+function showScene(index) {
+  scenes.forEach((s, i) => {
+    s.classList.remove('active', 'zooming');
+    if (i === index) {
+      s.classList.add('active');
+    }
+  });
+  
+  const scene = scenes[index];
+  document.getElementById('scaleName').textContent = scene.dataset.name;
+  document.getElementById('scaleValue').textContent = scene.dataset.scale + ' meters';
+  document.getElementById('progress').style.width = ((index + 1) / scenes.length * 100) + '%';
+  
+  playAmbient(index);
+  
+  // Show particles during quantum scales
+  document.getElementById('particles').classList.toggle('active', index >= 2 && index <= 4);
+}
+
+function zoomToNext() {
+  if (currentIndex >= scenes.length - 1) return;
+  
+  scenes[currentIndex].classList.add('zooming');
+  playZoomSound(440 - currentIndex * 40);
+  
+  setTimeout(() => {
+    currentIndex++;
+    showScene(currentIndex);
+    updateButtons();
+  }, 1500);
+}
+
+function zoomToPrevious() {
+  if (currentIndex <= 0) return;
+  
+  currentIndex--;
+  showScene(currentIndex);
+  playZoomSound(440 + currentIndex * 40);
+  updateButtons();
+}
+
+function updateButtons() {
+  const zoomBtn = document.getElementById('zoomBtn');
+  const reverseBtn = document.getElementById('reverseBtn');
+  
+  if (currentIndex === 4) { // At spacetime fabric
+    zoomBtn.textContent = 'Zoom Out to Earth';
+  } else if (currentIndex < 4) {
+    zoomBtn.textContent = 'Zoom Deeper';
+  } else {
+    zoomBtn.textContent = 'Zoom Further';
+  }
+  
+  zoomBtn.disabled = currentIndex >= scenes.length - 1;
+  reverseBtn.disabled = currentIndex <= 0;
+}
+
+// Event listeners
+document.getElementById('startBtn').addEventListener('click', function() {
+  initAudio();
+  document.getElementById('loading').style.display = 'none';
+  showScene(0);
+  this.style.display = 'none';
+  document.getElementById('zoomBtn').disabled = false;
+  journeyStarted = true;
+  createParticles();
+});
+
+document.getElementById('zoomBtn').addEventListener('click', zoomToNext);
+document.getElementById('reverseBtn').addEventListener('click', zoomToPrevious);
+
+document.getElementById('soundBtn').addEventListener('click', function() {
+  soundEnabled = !soundEnabled;
+  this.textContent = soundEnabled ? '🔊' : '🔇';
+});
+
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+  if (!journeyStarted) return;
+  if (e.key === 'ArrowDown' || e.key === ' ') zoomToNext();
+  if (e.key === 'ArrowUp') zoomToPrevious();
+});
+
+// Preload images
+let loadedImages = 0;
+images.forEach(src => {
+  const img = new Image();
+  img.onload = () => {
+    loadedImages++;
+    if (loadedImages === images.length) {
+      setTimeout(() => {
+        document.getElementById('loading').innerHTML = '<div class="loading-spinner"></div><div>Ready to begin</div>';
+        document.getElementById('startBtn').style.display = 'inline-block';
+      }, 500);
+    }
+  };
+  img.src = src;
+});
+</script>
+</body>
+</html>
