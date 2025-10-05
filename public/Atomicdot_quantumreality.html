@@ -3,263 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quantum Reality - Journey Through Scale</title>
+<title>Quantum Reality</title>
 <style>
 * {margin:0;padding:0;box-sizing:border-box}
 body {background:#000;color:#fff;font-family:'Segoe UI',system-ui;height:100vh;overflow:hidden;position:relative}
 
-.viewport {width:100%;height:100%;position:relative;overflow:hidden}
-.scene {position:absolute;width:100%;height:100%;background-size:cover;background-position:center;opacity:0;transition:opacity 2s ease}
-.scene.active {opacity:1}
-.scene.zooming {animation:zoomIn 3s ease-out forwards}
-@keyframes zoomIn {from{transform:scale(1)}to{transform:scale(50)}}
-@keyframes zoomOut {from{transform:scale(50)}to{transform:scale(1)}}
+.scene {width:100%;height:100%;position:absolute;opacity:0;transition:opacity 1.5s ease-in-out;pointer-events:none}
+.scene.active {opacity:1;pointer-events:all}
+
+/* Street - Living World */
+.street {background:linear-gradient(180deg,#87CEEB 0%,#98D8E8 50%,#F0E68C 100%)}
+.street .sun {position:absolute;width:80px;height:80px;background:radial-gradient(circle,#FFF8DC,#FFD700);border-radius:50%;top:10%;right:15%;box-shadow:0 0 120px #FFD700,0 0 60px #FFA500;animation:pulse 4s ease-in-out infinite}
+.street .cloud {position:absolute;background:#fff;border-radius:100px;opacity:0.8}
+.street .cloud::before {content:'';position:absolute;background:#fff;border-radius:100px;top:-30%;left:20%;width:50%;height:60%}
+.street .cloud::after {content:'';position:absolute;background:#fff;border-radius:100px;top:-20%;right:20%;width:40%;height:50%}
+.cloud1 {width:100px;height:40px;top:20%;left:10%;animation:drift 20s infinite}
+.cloud2 {width:80px;height:35px;top:30%;left:60%;animation:drift 25s infinite reverse}
+.street .ground {position:absolute;bottom:0;width:100%;height:40%;background:linear-gradient(180deg,#8B7355 0%,#6B5B4A 100%)}
+.street .hand-silhouette {position:absolute;bottom:20%;left:50%;transform:translateX(-50%);width:300px;height:350px;background:radial-gradient(ellipse at center,rgba(139,69,19,0.3),transparent);filter:blur(20px);animation:breathe 3s ease-in-out infinite}
+
+/* Molecular - Organic Chemistry */
+.molecular {background:radial-gradient(circle at 50% 50%,#0a0a1f,#000)}
+.molecule-container {position:absolute;width:100%;height:100%;transform-style:preserve-3d;animation:rotate3d 20s linear infinite}
+.atom {position:absolute;width:60px;height:60px;border-radius:50%;animation:vibrate 0.5s ease-in-out infinite}
+.carbon {background:radial-gradient(circle,#444,#000);box-shadow:0 0 30px rgba(100,100,100,0.8)}
+.hydrogen {width:40px;height:40px;background:radial-gradient(circle,#fff,#ddd);box-shadow:0 0 20px rgba(255,255,255,0.8)}
+.oxygen {background:radial-gradient(circle,#ff4444,#cc0000);box-shadow:0 0 30px rgba(255,68,68,0.8)}
+.bond {position:absolute;height:3px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.6),transparent);transform-origin:left center}
+
+/* Atomic - Nuclear Physics */
+.atomic {background:#000}
+.nucleus-container {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px}
+.proton,.neutron {position:absolute;width:20px;height:20px;border-radius:50%;animation:nuclear-vibrate 0.2s infinite}
+.proton {background:radial-gradient(circle,#ff6b6b,#c92a2a);box-shadow:0 0 15px #ff6b6b}
+.neutron {background:radial-gradient(circle,#6b6bff,#2a2ac9);box-shadow:0 0 15px #6b6bff}
+.orbital {position:absolute;border:1px solid rgba(100,200,255,0.2);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.electron {position:absolute;width:8px;height:8px;background:radial-gradient(circle,#00ffff,#0099cc);border-radius:50%;box-shadow:0 0 10px #00ffff;offset-path:path('M 0,0 A 1,1 0 1,1 0,0.01 Z')}
+
+/* Quantum - Wave Functions */
+.quantum {background:#000;overflow:hidden}
+.wave-function {position:absolute;width:100%;height:100%;opacity:0.6}
+.probability-cloud {position:absolute;width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);filter:blur(40px);background:radial-gradient(circle,rgba(100,200,255,0.8),transparent);animation:quantum-flux 3s ease-in-out infinite}
+.quantum-particle {position:absolute;width:4px;height:4px;background:#fff;border-radius:50%;animation:quantum-tunnel 2s linear infinite}
+.field-line {position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(100,200,255,0.3),transparent);animation:field-oscillate 2s ease-in-out infinite}
+
+/* Fabric - Spacetime Grid */
+.fabric {background:#000}
+.spacetime-grid {position:absolute;width:100%;height:100%;transform:perspective(800px) rotateX(60deg);transform-style:preserve-3d}
+.grid-plane {position:absolute;width:100%;height:100%;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(100,200,255,0.15) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(100,200,255,0.15) 40px);animation:ripple-effect 4s ease-in-out infinite}
+.gravity-well {position:absolute;width:200px;height:200px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,0.1),transparent);border-radius:50%;animation:gravity-pulse 3s ease-in-out infinite}
+
+/* Cosmic */
+.cosmic {background:#000}
+.nebula {position:absolute;width:100%;height:100%;background:radial-gradient(circle at 30% 40%,rgba(138,43,226,0.3),transparent),radial-gradient(circle at 70% 60%,rgba(30,144,255,0.3),transparent),radial-gradient(circle at 50% 50%,rgba(255,20,147,0.2),transparent);animation:nebula-swirl 30s ease-in-out infinite}
+.galaxy-spiral {position:absolute;width:400px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);animation:rotate 60s linear infinite}
+.spiral-arm {position:absolute;width:100%;height:100%;background:conic-gradient(from 0deg,transparent,rgba(255,255,255,0.1),transparent,rgba(255,255,255,0.1),transparent);border-radius:50%}
 
 /* UI */
-.header {position:absolute;top:0;width:100%;padding:20px;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent);z-index:100}
-.title {font-size:2em;letter-spacing:0.2em;font-weight:100;text-align:center;text-shadow:0 0 30px rgba(100,200,255,0.8)}
-.scale-indicator {position:absolute;top:80px;left:50%;transform:translateX(-50%);font-size:1.2em;padding:10px 30px;background:rgba(0,0,0,0.6);border:1px solid rgba(100,200,255,0.3);border-radius:30px;backdrop-filter:blur(10px);transition:all 0.5s}
-.scale-value {color:#4fc3f7;font-weight:bold}
-
+.title {position:absolute;top:40px;left:50%;transform:translateX(-50%);font-size:2.5em;letter-spacing:0.3em;font-weight:100;text-shadow:0 0 30px rgba(100,200,255,0.8);z-index:100;animation:glow 2s ease-in-out infinite alternate}
+.time-display {position:absolute;top:90px;left:50%;transform:translateX(-50%);font-size:1em;opacity:0.7;z-index:100}
+.scale-label {position:absolute;bottom:120px;left:50%;transform:translateX(-50%);font-size:1.3em;padding:12px 35px;background:linear-gradient(135deg,rgba(100,200,255,0.1),rgba(0,0,0,0.8));border:1px solid rgba(100,200,255,0.4);border-radius:50px;backdrop-filter:blur(10px);z-index:100;transition:all 0.5s}
 .controls {position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:15px;z-index:100}
-button {padding:12px 25px;background:rgba(100,200,255,0.1);color:#fff;border:1px solid rgba(100,200,255,0.5);border-radius:25px;cursor:pointer;transition:all 0.3s;backdrop-filter:blur(5px)}
-button:hover {background:rgba(100,200,255,0.3);transform:translateY(-2px)}
-button:disabled {opacity:0.5;cursor:not-allowed}
+button {padding:12px 25px;font-size:0.95em;background:linear-gradient(135deg,rgba(100,200,255,0.2),rgba(100,200,255,0.05));color:#fff;border:1px solid rgba(100,200,255,0.6);border-radius:25px;cursor:pointer;transition:all 0.3s;backdrop-filter:blur(5px)}
+button:hover {background:linear-gradient(135deg,rgba(100,200,255,0.4),rgba(100,200,255,0.1));transform:translateY(-2px);box-shadow:0 5px 20px rgba(100,200,255,0.3)}
 
-.progress-bar {position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:400px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
-.progress-fill {height:100%;background:linear-gradient(90deg,#4fc3f7,#2196f3);width:0;transition:width 3s ease}
+/* Animations */
+@keyframes pulse {0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes drift {0%{transform:translateX(0)}100%{transform:translateX(100px)}}
+@keyframes breathe {0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.1)}}
+@keyframes rotate3d {from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+@keyframes vibrate {0%,100%{transform:translate(0,0)}50%{transform:translate(1px,1px)}}
+@keyframes nuclear-vibrate {0%{transform:translate(0,0)}25%{transform:translate(2px,2px)}50%{transform:translate(-2px,2px)}75%{transform:translate(2px,-2px)}100%{transform:translate(0,0)}}
+@keyframes quantum-flux {0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6}50%{transform:translate(-50%,-50%) scale(1.5);opacity:0.3}}
+@keyframes quantum-tunnel {0%{transform:translate(0,0);opacity:0}50%{opacity:1}100%{transform:translate(500px,200px);opacity:0}}
+@keyframes field-oscillate {0%,100%{transform:scaleY(1)}50%{transform:scaleY(2)}}
+@keyframes ripple-effect {0%,100%{transform:perspective(800px) rotateX(60deg) scale(1)}50%{transform:perspective(800px) rotateX(60deg) scale(1.02)}}
+@keyframes gravity-pulse {0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.3)}}
+@keyframes nebula-swirl {0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.2) rotate(180deg)}}
+@keyframes rotate {from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes glow {0%{text-shadow:0 0 30px rgba(100,200,255,0.8)}100%{text-shadow:0 0 50px rgba(100,200,255,1),0 0 70px rgba(100,200,255,0.5)}}
 
-.loading {position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:1000}
-.loading-spinner {width:50px;height:50px;border:3px solid rgba(100,200,255,0.3);border-top-color:#4fc3f7;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px}
-@keyframes spin {to{transform:rotate(360deg)}}
-
-/* Particle overlay */
-.particles {position:absolute;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 1s}
-.particles.active {opacity:1}
-.particle {position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:float-particle 10s linear infinite}
-@keyframes float-particle {
-  from {transform:translateY(100vh) translateX(0)}
-  to {transform:translateY(-100px) translateX(100px)}
-}
+.dimensions {display:none;position:absolute;width:100%;height:100%;pointer-events:none;z-index:50}
+.dimension-portal {position:absolute;width:80px;height:80px;border:2px solid rgba(255,100,255,0.6);border-radius:50%;background:radial-gradient(circle,rgba(255,100,255,0.2),transparent);animation:spin 4s linear infinite}
+@keyframes spin {from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div class="loading" id="loading">
-  <div class="loading-spinner"></div>
-  <div>Initializing Quantum Journey...</div>
+<h1 class="title">QUANTUM REALITY</h1>
+<div class="time-display" id="timeDisplay"></div>
+<div class="scale-label" id="scaleLabel">Human Scale - 1 meter</div>
+
+<div class="scene street active" id="street">
+  <div class="sun"></div>
+  <div class="cloud cloud1"></div>
+  <div class="cloud cloud2"></div>
+  <div class="ground"></div>
+  <div class="hand-silhouette"></div>
 </div>
 
-<div class="viewport">
-  <div class="scene" data-scale="10⁰" data-name="Human Scale"></div>
-  <div class="scene" data-scale="10⁻⁹" data-name="Molecular"></div>
-  <div class="scene" data-scale="10⁻¹⁰" data-name="Atomic"></div>
-  <div class="scene" data-scale="10⁻¹⁵" data-name="Quantum Realm"></div>
-  <div class="scene" data-scale="10⁻³⁵" data-name="Spacetime Fabric"></div>
-  <div class="scene" data-scale="10⁷" data-name="Earth"></div>
-  <div class="scene" data-scale="10²¹" data-name="Galactic"></div>
-  <div class="scene" data-scale="10²⁶" data-name="Cosmic Web"></div>
-  <div class="particles" id="particles"></div>
+<div class="scene molecular" id="molecular">
+  <div class="molecule-container" id="moleculeContainer"></div>
 </div>
 
-<div class="header">
-  <h1 class="title">QUANTUM REALITY</h1>
-  <div class="scale-indicator">
-    <span id="scaleName">Human Scale</span> - <span class="scale-value" id="scaleValue">10⁰ meters</span>
+<div class="scene atomic" id="atomic">
+  <div class="nucleus-container" id="nucleusContainer"></div>
+  <div class="orbital" style="width:200px;height:200px">
+    <div class="electron" style="animation:rotate 2s linear infinite"></div>
+  </div>
+  <div class="orbital" style="width:300px;height:300px">
+    <div class="electron" style="animation:rotate 3s linear infinite reverse"></div>
   </div>
 </div>
 
-<div class="controls">
-  <button id="startBtn">Begin Journey</button>
-  <button id="zoomBtn" disabled>Zoom Deeper</button>
-  <button id="reverseBtn" disabled>Reverse</button>
-  <button id="soundBtn">🔊</button>
+<div class="scene quantum" id="quantum">
+  <div class="wave-function">
+    <div class="probability-cloud"></div>
+  </div>
 </div>
 
-<div class="progress-bar">
-  <div class="progress-fill" id="progress"></div>
+<div class="scene fabric" id="fabric">
+  <div class="spacetime-grid">
+    <div class="grid-plane"></div>
+    <div class="gravity-well"></div>
+  </div>
+</div>
+
+<div class="scene cosmic" id="cosmic">
+  <div class="nebula"></div>
+  <div class="galaxy-spiral">
+    <div class="spiral-arm"></div>
+  </div>
+</div>
+
+<div class="dimensions" id="dimensions"></div>
+
+<div class="controls">
+  <button id="zoomBtn">Zoom Deeper ↓</button>
+  <button id="cosmicBtn">Cosmic View</button>
+  <button id="dimBtn">Hidden Dimensions</button>
 </div>
 
 <script>
-// Image mapping - update these filenames to match your actual files
-const images = [
-  'hand.jpg',      // Human scale
-  'molecules.jpg', // Molecular
-  'atom.jpg',      // Atomic
-  'quantum.jpg',   // Quantum
-  'spacetime.jpg', // Spacetime fabric
-  'earth.jpg',     // Earth
-  'galaxy.jpg',    // Galaxy
-  'cosmic.jpg'     // Cosmic web
-];
+const scenes = ['street','molecular','atomic','quantum','fabric'];
+const labels = ['Human Scale - 1 meter','Molecular - 10⁻⁹ meters','Atomic - 10⁻¹⁰ meters','Quantum - 10⁻¹⁵ meters','Spacetime Fabric'];
+let currentScale = 0;
+let cosmicActive = false;
 
-const scenes = document.querySelectorAll('.scene');
-let currentIndex = 0;
-let audioContext;
-let soundEnabled = true;
-let journeyStarted = false;
-let isReversing = false;
-
-// Initialize images
-scenes.forEach((scene, i) => {
-  scene.style.backgroundImage = `url('${images[i]}')`;
-});
-
-// Sound system
-function initAudio() {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  }
+function setTimeLocation() {
+  const now = new Date();
+  const hour = now.getHours();
+  let location = '';
+  if (hour >= 5 && hour < 12) location = 'Morning Light';
+  else if (hour >= 12 && hour < 17) location = 'Afternoon Glow';
+  else if (hour >= 17 && hour < 20) location = 'Golden Hour';
+  else location = 'Night Vision';
+  document.getElementById('timeDisplay').textContent = now.toLocaleTimeString() + ' - ' + location;
 }
 
-function playZoomSound(frequency = 440, duration = 0.5) {
-  if (!soundEnabled || !audioContext) return;
-  
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  
-  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.5, audioContext.currentTime + duration);
-  
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-  
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + duration);
+function createMolecule() {
+  const container = document.getElementById('moleculeContainer');
+  const positions = [
+    {x:50,y:50,type:'carbon'},
+    {x:30,y:30,type:'hydrogen'},
+    {x:70,y:30,type:'hydrogen'},
+    {x:30,y:70,type:'oxygen'},
+    {x:70,y:70,type:'hydrogen'}
+  ];
+  positions.forEach((pos,i) => {
+    const atom = document.createElement('div');
+    atom.className = `atom ${pos.type}`;
+    atom.style.left = pos.x + '%';
+    atom.style.top = pos.y + '%';
+    atom.style.animationDelay = i * 0.1 + 's';
+    container.appendChild(atom);
+    if(i > 0) {
+      const bond = document.createElement('div');
+      bond.className = 'bond';
+      bond.style.width = '100px';
+      bond.style.left = '50%';
+      bond.style.top = '50%';
+      bond.style.transform = `rotate(${i * 72}deg)`;
+      container.appendChild(bond);
+    }
+  });
 }
 
-function playAmbient(index) {
-  if (!soundEnabled || !audioContext) return;
-  
-  const frequencies = [220, 180, 150, 110, 80, 260, 320, 400];
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(frequencies[index], audioContext.currentTime);
-  gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
-  
-  oscillator.start();
-  setTimeout(() => oscillator.stop(), 2000);
-}
-
-// Create particles
-function createParticles() {
-  const container = document.getElementById('particles');
-  for (let i = 0; i < 50; i++) {
+function createNucleus() {
+  const container = document.getElementById('nucleusContainer');
+  for(let i = 0; i < 12; i++) {
     const particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 10 + 's';
-    particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+    particle.className = i % 2 ? 'proton' : 'neutron';
+    particle.style.left = 40 + Math.random() * 40 + 'px';
+    particle.style.top = 40 + Math.random() * 40 + 'px';
     container.appendChild(particle);
   }
 }
 
-// Navigation
-function showScene(index) {
-  scenes.forEach((s, i) => {
-    s.classList.remove('active', 'zooming');
-    if (i === index) {
-      s.classList.add('active');
-    }
-  });
-  
-  const scene = scenes[index];
-  document.getElementById('scaleName').textContent = scene.dataset.name;
-  document.getElementById('scaleValue').textContent = scene.dataset.scale + ' meters';
-  document.getElementById('progress').style.width = ((index + 1) / scenes.length * 100) + '%';
-  
-  playAmbient(index);
-  
-  // Show particles during quantum scales
-  document.getElementById('particles').classList.toggle('active', index >= 2 && index <= 4);
-}
-
-function zoomToNext() {
-  if (currentIndex >= scenes.length - 1) return;
-  
-  scenes[currentIndex].classList.add('zooming');
-  playZoomSound(440 - currentIndex * 40);
-  
-  setTimeout(() => {
-    currentIndex++;
-    showScene(currentIndex);
-    updateButtons();
-  }, 1500);
-}
-
-function zoomToPrevious() {
-  if (currentIndex <= 0) return;
-  
-  currentIndex--;
-  showScene(currentIndex);
-  playZoomSound(440 + currentIndex * 40);
-  updateButtons();
-}
-
-function updateButtons() {
-  const zoomBtn = document.getElementById('zoomBtn');
-  const reverseBtn = document.getElementById('reverseBtn');
-  
-  if (currentIndex === 4) { // At spacetime fabric
-    zoomBtn.textContent = 'Zoom Out to Earth';
-  } else if (currentIndex < 4) {
-    zoomBtn.textContent = 'Zoom Deeper';
-  } else {
-    zoomBtn.textContent = 'Zoom Further';
+function createQuantumField() {
+  const quantum = document.getElementById('quantum');
+  for(let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'quantum-particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 2 + 's';
+    quantum.appendChild(particle);
   }
-  
-  zoomBtn.disabled = currentIndex >= scenes.length - 1;
-  reverseBtn.disabled = currentIndex <= 0;
+  for(let i = 0; i < 10; i++) {
+    const field = document.createElement('div');
+    field.className = 'field-line';
+    field.style.top = i * 10 + '%';
+    field.style.animationDelay = i * 0.2 + 's';
+    quantum.appendChild(field);
+  }
 }
 
-// Event listeners
-document.getElementById('startBtn').addEventListener('click', function() {
-  initAudio();
-  document.getElementById('loading').style.display = 'none';
-  showScene(0);
-  this.style.display = 'none';
-  document.getElementById('zoomBtn').disabled = false;
-  journeyStarted = true;
-  createParticles();
+function createStars() {
+  const cosmic = document.getElementById('cosmic');
+  for(let i = 0; i < 200; i++) {
+    const star = document.createElement('div');
+    star.style.position = 'absolute';
+    star.style.width = star.style.height = Math.random() * 3 + 'px';
+    star.style.background = '#fff';
+    star.style.borderRadius = '50%';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animation = `pulse ${Math.random() * 3 + 2}s ease-in-out infinite`;
+    cosmic.appendChild(star);
+  }
+}
+
+function createDimensions() {
+  const container = document.getElementById('dimensions');
+  for(let i = 0; i < 11; i++) {
+    const portal = document.createElement('div');
+    portal.className = 'dimension-portal';
+    portal.style.left = Math.random() * 80 + 10 + '%';
+    portal.style.top = Math.random() * 80 + 10 + '%';
+    portal.style.animationDelay = i * 0.3 + 's';
+    portal.style.width = portal.style.height = (40 + Math.random() * 40) + 'px';
+    container.appendChild(portal);
+  }
+}
+
+document.getElementById('zoomBtn').addEventListener('click', function() {
+  if (cosmicActive) return;
+  document.getElementById(scenes[currentScale]).classList.remove('active');
+  currentScale = (currentScale + 1) % scenes.length;
+  document.getElementById(scenes[currentScale]).classList.add('active');
+  document.getElementById('scaleLabel').textContent = labels[currentScale];
+  this.textContent = currentScale === scenes.length - 1 ? 'Return to Surface ↑' : 'Zoom Deeper ↓';
 });
 
-document.getElementById('zoomBtn').addEventListener('click', zoomToNext);
-document.getElementById('reverseBtn').addEventListener('click', zoomToPrevious);
-
-document.getElementById('soundBtn').addEventListener('click', function() {
-  soundEnabled = !soundEnabled;
-  this.textContent = soundEnabled ? '🔊' : '🔇';
+document.getElementById('cosmicBtn').addEventListener('click', function() {
+  const cosmic = document.getElementById('cosmic');
+  const current = document.getElementById(scenes[currentScale]);
+  cosmicActive = !cosmicActive;
+  if (cosmicActive) {
+    current.classList.remove('active');
+    cosmic.classList.add('active');
+    document.getElementById('scaleLabel').textContent = 'Cosmic Scale - 10²⁶ meters';
+    this.textContent = 'Return to Earth';
+  } else {
+    cosmic.classList.remove('active');
+    current.classList.add('active');
+    document.getElementById('scaleLabel').textContent = labels[currentScale];
+    this.textContent = 'Cosmic View';
+  }
 });
 
-// Keyboard controls
-document.addEventListener('keydown', (e) => {
-  if (!journeyStarted) return;
-  if (e.key === 'ArrowDown' || e.key === ' ') zoomToNext();
-  if (e.key === 'ArrowUp') zoomToPrevious();
+document.getElementById('dimBtn').addEventListener('click', function() {
+  const dims = document.getElementById('dimensions');
+  dims.style.display = dims.style.display === 'block' ? 'none' : 'block';
+  this.textContent = dims.style.display === 'block' ? 'Hide Dimensions' : 'Hidden Dimensions';
 });
 
-// Preload images
-let loadedImages = 0;
-images.forEach(src => {
-  const img = new Image();
-  img.onload = () => {
-    loadedImages++;
-    if (loadedImages === images.length) {
-      setTimeout(() => {
-        document.getElementById('loading').innerHTML = '<div class="loading-spinner"></div><div>Ready to begin</div>';
-        document.getElementById('startBtn').style.display = 'inline-block';
-      }, 500);
-    }
-  };
-  img.src = src;
-});
+setTimeLocation();
+createMolecule();
+createNucleus();
+createQuantumField();
+createStars();
+createDimensions();
+setInterval(setTimeLocation, 1000);
 </script>
 </body>
 </html>
