@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike APAC Strategic Advisory | From Inertia to<br>Immortality</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: white;
+            color: black;
+            line-height: 1.6;
+        }
+        
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 80px;
+            border-top: 4px solid black;
+        }
+        
+        section:first-child {
+            border-top: none;
+            justify-content: flex-start;
+            align-items: flex-end;
+            padding-bottom: 128px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 144px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 48px;
+            letter-spacing: -2px;
+        }
+        
+        h2 {
+            font-size: 144px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 96px;
+            letter-spacing: -2px;
+        }
+        
+        h3 {
+            font-size: 96px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 80px;
+            letter-spacing: -1px;
+        }
+        
+        .label {
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 24px;
+        }
+        
+        .subtitle {
+            font-size: 28px;
+            font-weight: 300;
+            color: #666;
+            margin-bottom: 48px;
+            max-width: 700px;
+        }
+        
+        .divider {
+            width: 96px;
+            height: 4px;
+            background: black;
+            margin-bottom: 32px;
+        }
+        
+        .tag {
+            display: inline-block;
+            border: 2px solid black;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 32px;
+        }
+        
+        .context-block {
+            margin-bottom: 80px;
+        }
+        
+        .context-text {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
+        
+        .context-detail {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .insight-block {
+            margin-bottom: 80px;
+        }
+        
+        .insight-text {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 32px;
+        }
+        
+        .insight-desc {
+            font-size: 20px;
+            color: #666;
+        }
+        
+        .bullet-list {
+            margin-top: 48px;
+        }
+        
+        .bullet-item {
+            margin-bottom: 48px;
+            padding-left: 32px;
+            border-left: 4px solid black;
+        }
+        
+        .bullet-item h4 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 16px;
+        }
+        
+        .bullet-item p {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 96px;
+            margin-bottom: 80px;
+        }
+        
+        .col-item h4 {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 32px;
+            line-height: 1.2;
+        }
+        
+        .col-item p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        
+        .col-item .bar {
+            width: 80px;
+            height: 8px;
+            background: black;
+            margin-bottom: 40px;
+        }
+        
+        .black-box {
+            background: #000;
+            color: #fff;
+            padding: 80px;
+            margin-bottom: 80px;
+        }
+        
+        .black-box h2 {
+            color: white;
+            margin-bottom: 48px;
+            font-size: 112px;
+        }
+        
+        .black-box h3 {
+            color: white;
+            font-size: 72px;
+            margin-bottom: 48px;
+        }
+        
+        .black-box p {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+        
+        .spec-list {
+            margin-top: 48px;
+        }
+        
+        .spec-item {
+            margin-bottom: 64px;
+            padding-bottom: 64px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+        
+        .spec-item h4 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 24px;
+        }
+        
+        .spec-item p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .summary-table {
+            background: #f5f5f5;
+            padding: 64px;
+            margin-top: 96px;
+        }
+        
+        .summary-table h4 {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 48px;
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 48px;
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .table-label {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .table-value {
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .final-divider {
+            width: 100%;
+            height: 4px;
+            background: black;
+            margin-bottom: 48px;
+        }
+        
+        .final-text {
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+        
+        .final-heading {
+            font-size: 84px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+        
+        .disclaimer {
+            font-size: 11px;
+            color: #999;
+            margin-top: 120px;
+            padding-top: 40px;
+            border-top: 1px solid #ddd;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 40px;
+            }
+            h1, h2 {
+                font-size: 64px;
+            }
+            h3 {
+                font-size: 48px;
+            }
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO -->
+    <section>
+        <div class="container">
+            <div class="tag">NIKE APAC + INDIA</div>
+            <div class="label">Strategic Advisory | Q1 2026</div>
+            <h1>FROM<br>INERTIA TO<br>IMMORTALITY</h1>
+            <div class="divider"></div>
+            <p class="subtitle">The creative strategy to leveling business & sales.</p>
+        </div>
+    </section>
+
+    <!-- 01 STARTING BLOCKS -->
+    <section>
+        <div class="container">
+            <span class="label">01</span>
+            <h2>STARTING<br>BLOCKS</h2>
+            
+            <div class="context-block">
+                <p class="context-text">Nike APAC is currently immobilised by USD 8B in stagnant inventory.</p>
+                <p class="context-detail">In 2026, shifting financial & tariff dynamics will concentrate premium stock in Vietnam and India warehouses. The inertia of billions in capital locked in chemical foams (React/ZoomX), and storage losses with products that have an expiration date.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 02 THE TRACK -->
+    <section>
+        <div class="container">
+            <span class="label">02</span>
+            <h2>THE<br>TRACK</h2>
+
+            <div class="context-block">
+                <p class="context-text">Four regional behaviours prove the market is ready for a pivot.</p>
+            </div>
+
+            <div class="bullet-list">
+                <div class="bullet-item">
+                    <h4>Vietnam</h4>
+                    <p>TikTok Shop (USD 3.5B) shows that proof of use drives transactions. We pivot to invisible branding.</p>
+                </div>
+                <div class="bullet-item">
+                    <h4>Singapore</h4>
+                    <p>The USD 107M Labubu phenomenon hinted at a hunger for 'felt cute'. There's value in its scarcity.</p>
+                </div>
+                <div class="bullet-item">
+                    <h4>Malaysia</h4>
+                    <p>The run club growth, despite the barrier to entry, shows retail can be trans-medium.</p>
+                </div>
+                <div class="bullet-item">
+                    <h4>India</h4>
+                    <p>43% growth in Tier 2 cities proves that durability and value for money is kind but not at the cost of rising status.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 03 WHAT PEOPLE WANT -->
+    <section>
+        <div class="container">
+            <span class="label">03</span>
+            <h2>WHAT DO<br>PEOPLE WANT<br>MORE THAN<br>STATUS?</h2>
+
+            <div class="insight-block">
+                <p class="insight-text">Permanence.</p>
+                <p class="insight-desc">Nike can never be erased. No brand can compete. A new form of dominance is the quiet flex to live forever.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 04 IMMORTALITY -->
+    <section>
+        <div class="container">
+            <span class="label">04</span>
+            <h2>IMMORTALITY</h2>
+
+            <div class="black-box">
+                <p>The creative approach to business growth.</p>
+                <p>Nike plays on the offense with moves only privy to a forever brand.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 05 NIKENETICS -->
+    <section>
+        <div class="container">
+            <span class="label">05</span>
+            <h2>NIKENETICS</h2>
+
+            <div class="context-block">
+                <p class="context-text">Retrofit shoes in backlog with:</p>
+            </div>
+
+            <div class="spec-list">
+                <div class="spec-item">
+                    <h4>The Core</h4>
+                    <p>Degrading foam to NASA Nitinol (SMA) Lattice.</p>
+                </div>
+
+                <div class="spec-item">
+                    <h4>The Physics</h4>
+                    <p>Nitinol provides 10% reversible strain, allowing for considerable energy return. Unlike foam, this metal lattice reduces gravity's force and never loses its bounce.</p>
+                </div>
+
+                <div class="spec-item">
+                    <h4>Sentient Cyan</h4>
+                    <p>We apply a structural interference coating (NASA). Light diffraction to pulse deep cyan or pink only when the athlete is in motion. The result is a shoe that shimmers like plasma and comes alive.</p>
+                </div>
+
+                <div class="spec-item">
+                    <h4>The Shoe Becomes a Value-Generating Node</h4>
+                    <p><strong>Tech:</strong> Embedded Fraunhofer piezoelectric thin-films harvest energy with step.</p>
+                    <p><strong>Value:</strong> This microcurrent powers an onboard chip that verifies Gait DNA.</p>
+                    <p><strong>Financial Loop ($NKEP):</strong> Users mine Nike Power Tokens. Token drops are pump days for the stock market. These are tradable for what universe tier assets. Turn Nike into a yield-bearing asset that gives back with every step.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 06 MASSLESS BOUNCE -->
+    <section>
+        <div class="container">
+            <span class="label">06</span>
+            <h2>MASSLESS<br>BOUNCE</h2>
+
+            <div class="context-block">
+                <p class="context-text">Turn planned obsolescence into the infinite journey.</p>
+            </div>
+
+            <div class="spec-list">
+                <div class="spec-item">
+                    <h4>Semiotic Identity</h4>
+                    <p>We move away from loud branding. We use invisible statements to avoid 2026 bot requirement for commercials. Touch of metameric ink (Swoosh visible only under flash), looks alive and laser-etched Gait Maps give life.</p>
+                </div>
+
+                <div class="spec-item">
+                    <h4>The Strategy</h4>
+                    <p>We solve the APAC inventory with immortal lift.</p>
+                </div>
+            </div>
+
+            <div class="summary-table">
+                <h4>Executive Summary</h4>
+                
+                <div class="table-row">
+                    <div class="table-label">Logic</div>
+                    <div class="table-value">From obsolescence to immortality (300 to 1,000+ miles)</div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-label">Material</div>
+                    <div class="table-value">NASA Nitinol Lattice (Indestructible Bounce)</div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-label">Visual</div>
+                    <div class="table-value">Interference cyan </div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-label">Financial Ecosystem</div>
+                    <div class="table-value">Kinetic mining and a yield-bearing asset</div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-label">Semiotic</div>
+                    <div class="table-value">Ghost branding visible to the initiated</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 07 THE POSITION -->
+    <section>
+        <div class="container">
+            <span class="label">07</span>
+            
+            <div class="final-divider"></div>
+            <p class="final-text">NIKE APAC + INDIA</p>
+            <h1 class="final-heading">JUST DO IT.<br>NOW MAKE<br>IT LAST.</h1>
+
+            <div class="disclaimer">
+                Market figures sourced from publicly available industry reports and web research. Some differences may exist.
+            </div>
+        </div>
+    </section>
+</body>
+</html>
