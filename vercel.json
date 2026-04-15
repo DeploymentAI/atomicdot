@@ -1,10 +1,10 @@
 {
-  "version": 2,
   "routes": [
-    { "src": "^/$", "dest": "/index.html" },
-    { "src": "^/unified$", "dest": "/atomicdot-unified-fixed.html" },
-    { "src": "^/services/tc-decoded$", "dest": "/tc-decoded-service.html" },
-    { "src": "^/services/scarcity$", "dest": "/atomic_dot_scarcity_dashboard_prv%20new.html" },
-    { "src": "^/services/inflation$", "dest": "/global_inflation_tracker.html" }
+    {"src": "/public/pure-frequency-home.html", "dest": "/index.html"},
+    {"src": "/atomic-dot", "dest": "/public/index.html"},
+    {"src": "/unified", "dest": "/unified"},
+    {"src": "/services/tc-decoded", "dest": "/services/tc-decoded"},
+    {"src": "/services/scarcity", "dest": "/services/scarcity"},
+    {"src": "/services/inflation", "dest": "/services/inflation"}
   ]
 }
